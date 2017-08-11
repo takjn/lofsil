@@ -11,17 +11,13 @@ using namespace cv;
 #define DBG_PCMONITOR (1)
 
 // Intrinsic parameters of the camera (cf. OpenCV's Camera Calibration)
-#define CAMERA_0_X 0            // Position (x)
-#define CAMERA_0_Y -130          // Position (x)
-#define CAMERA_0_Z 0            // Position (x)
+#define CAMERA_0_DISTANCE 130
 #define CAMERA_0_CENTER_U 160   // Optical centers (cx)
 #define CAMERA_0_CENTER_V 120   // Optical centers (cy)
 #define CAMERA_0_FX 220.0       // Focal length(fx)
 #define CAMERA_0_FY 220.0       // Focal length(fy)
 
-#define CAMERA_1_X -110          // Position (x)
-#define CAMERA_1_Y 0            // Position (x)
-#define CAMERA_1_Z 0            // Position (x)
+#define CAMERA_1_DISTANCE 110
 #define CAMERA_1_CENTER_U 160   // Optical centers (cx)
 #define CAMERA_1_CENTER_V 120   // Optical centers (cy)
 #define CAMERA_1_FX 220.0       // Focal length(fx)
@@ -74,9 +70,7 @@ int projection_0(double Xw, double Yw,double Zw, int &u, int &v)
     double Zc = Zw;
 
     // Perspective projection
-    Xc += CAMERA_0_X;
-    Yc += CAMERA_0_Y;
-    Zc += CAMERA_0_Z;
+    Yc -= CAMERA_0_DISTANCE;
   
     u = CAMERA_0_CENTER_U - (int)((Xc/Yc)*(CAMERA_0_FX));
     v = VIDEO_PIXEL_VW - (CAMERA_0_CENTER_V - (int)((Zc/Yc)*(CAMERA_0_FY)));
@@ -98,9 +92,7 @@ int projection_1(double Xw, double Yw,double Zw, int &u, int &v)
     double Zc = Zw;
 
     // Perspective projection
-    Xc += CAMERA_1_X;
-    Yc += CAMERA_1_Y;
-    Zc += CAMERA_1_Z;
+    Yc -= CAMERA_1_DISTANCE;
   
     u = CAMERA_1_CENTER_U - (int)((Xc/Yc)*(CAMERA_1_FX));
     v = VIDEO_PIXEL_VW - (CAMERA_1_CENTER_V - (int)((Zc/Yc)*(CAMERA_1_FY)));
@@ -137,31 +129,33 @@ void shape_from_silhouette() {
 
             xx = (-point_cloud.SIZE / 2) * point_cloud.SCALE;
             for (int x=0; x<point_cloud.SIZE; x++, xx += point_cloud.SCALE, pcd_index++) {
-                if (point_cloud.get(pcd_index) == 1) {
                     
-                    // Project a 3D point into camera0 coordinates
-                    if (projection_0(xx, yy, zz, u, v)) {
-                        if (img_silhouette_0.at<unsigned char>(v, u)) {
+                // Project a 3D point into camera0 coordinates
+                if (projection_0(xx, yy, zz, u, v)) {
+                    if (img_silhouette_0.at<unsigned char>(v, u)) {
 
-                            // // Project a 3D point into camera1 coordinates
-                            // if (projection_1(xx, yy, zz, u, v)) {
-                            //     if (img_silhouette_1.at<unsigned char>(v, u)) {
-                            //         // Keep the point because it is inside the shilhouette
-                            //     }
-                            // }
-                            // else {
-                            //     // Delete the point because it is outside the shilhouette
-                            //     point_cloud.set(pcd_index, 0);
-                            // }
+                        // Project a 3D point into camera1 coordinates
+                        if (projection_1(xx, yy, zz, u, v)) {
+                            if (img_silhouette_1.at<unsigned char>(v, u)) {
+                                // Keep the point because it is inside the shilhouette
+                            }
+                            else {
+                                // Delete the point because it is outside the shilhouette
+                                point_cloud.set(pcd_index, 0);
+                            }
                         }
                         else {
-                            // Delete the point because it is outside the shilhouette
+                            // Delete the point because it is outside the camera image
                             point_cloud.set(pcd_index, 0);
                         }
-                    } else {
-                        // Delete the point because it is outside the camera image
+                    }
+                    else {
+                        // Delete the point because it is outside the shilhouette
                         point_cloud.set(pcd_index, 0);
                     }
+                } else {
+                    // Delete the point because it is outside the camera image
+                    point_cloud.set(pcd_index, 0);
                 }
             }
         }
