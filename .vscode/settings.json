@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "lcp.c": "cpp",
+        "ppp.c": "cpp",
+        "ethernet_api.c": "cpp"
+    }
+}

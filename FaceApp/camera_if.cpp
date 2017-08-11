@@ -34,12 +34,14 @@
 
 using namespace cv;
 
-static uint8_t FrameBuffer_Video[FRAME_BUFFER_STRIDE * FRAME_BUFFER_HEIGHT]__attribute((section("NC_BSS"),aligned(32)));
+static uint8_t FrameBuffer_Video_0[FRAME_BUFFER_STRIDE * FRAME_BUFFER_HEIGHT]__attribute((section("NC_BSS"),aligned(32)));
+static uint8_t FrameBuffer_Video_1[FRAME_BUFFER_STRIDE * FRAME_BUFFER_HEIGHT]__attribute((section("NC_BSS"),aligned(32)));
 static uint8_t JpegBuffer[1024 * 63]__attribute((aligned(32)));
 
 /* jpeg convert */
 static JPEG_Converter Jcu;
-static DisplayBase Display;
+static DisplayBase Display_0;
+static DisplayBase Display_1;
 
 #if MBED_CONF_APP_LCD
 #define RESULT_BUFFER_BYTE_PER_PIXEL  (2u)
@@ -115,8 +117,12 @@ size_t encode_jpeg(uint8_t* buf, int len, int width, int height, uint8_t* inbuf)
     return encode_size;
 }
 
-size_t create_jpeg(){
-    return encode_jpeg(JpegBuffer, sizeof(JpegBuffer), VIDEO_PIXEL_HW, VIDEO_PIXEL_VW, FrameBuffer_Video);
+size_t create_jpeg_0(){
+    return encode_jpeg(JpegBuffer, sizeof(JpegBuffer), VIDEO_PIXEL_HW, VIDEO_PIXEL_VW, FrameBuffer_Video_0);
+}
+
+size_t create_jpeg_1(){
+    return encode_jpeg(JpegBuffer, sizeof(JpegBuffer), VIDEO_PIXEL_HW, VIDEO_PIXEL_VW, FrameBuffer_Video_1);
 }
 
 uint8_t* get_jpeg_adr(){
@@ -124,33 +130,33 @@ uint8_t* get_jpeg_adr(){
 }
 
 /* Starts the camera */
-void camera_start(void)
+void camera_start_0(void)
 {
     // Initialize the background to black
-    for (int i = 0; i < sizeof(FrameBuffer_Video); i += 2) {
-        FrameBuffer_Video[i + 0] = 0x10;
-        FrameBuffer_Video[i + 1] = 0x80;
+    for (int i = 0; i < sizeof(FrameBuffer_Video_0); i += 2) {
+        FrameBuffer_Video_0[i + 0] = 0x10;
+        FrameBuffer_Video_0[i + 1] = 0x80;
     }
 
     // Camera
 #if ASPECT_RATIO_16_9
-    EasyAttach_Init(Display, 640, 360);  //aspect ratio 16:9
+    EasyAttach_Init(Display_0, 640, 360);  //aspect ratio 16:9
 #else
-    EasyAttach_Init(Display);            //aspect ratio 4:3
+    EasyAttach_Init(Display_0);            //aspect ratio 4:3
 #endif
 
     // Video capture setting (progressive form fixed)
-    Display.Video_Write_Setting(
+    Display_0.Video_Write_Setting(
         DisplayBase::VIDEO_INPUT_CHANNEL_0,
         DisplayBase::COL_SYS_NTSC_358,
-        (void *)FrameBuffer_Video,
+        (void *)FrameBuffer_Video_0,
         FRAME_BUFFER_STRIDE,
         VIDEO_FORMAT,
         WR_RD_WRSWA,
         VIDEO_PIXEL_VW,
         VIDEO_PIXEL_HW
     );
-    EasyAttach_CameraStart(Display, DisplayBase::VIDEO_INPUT_CHANNEL_0);
+    EasyAttach_CameraStart(Display_0, DisplayBase::VIDEO_INPUT_CHANNEL_0);
 
 #if MBED_CONF_APP_LCD
     DisplayBase::rect_t rect;
@@ -160,15 +166,15 @@ void camera_start(void)
     rect.vw = VIDEO_PIXEL_VW;
     rect.hs = 0;
     rect.hw = VIDEO_PIXEL_HW;
-    Display.Graphics_Read_Setting(
+    Display_0.Graphics_Read_Setting(
         DisplayBase::GRAPHICS_LAYER_0,
-        (void *)FrameBuffer_Video,
+        (void *)FrameBuffer_Video_0,
         FRAME_BUFFER_STRIDE,
         GRAPHICS_FORMAT,
         WR_RD_WRSWA,
         &rect
     );
-    Display.Graphics_Start(DisplayBase::GRAPHICS_LAYER_0);
+    Display_0.Graphics_Start(DisplayBase::GRAPHICS_LAYER_0);
 
     // GRAPHICS_LAYER_2
     memset(user_frame_buffer_result, 0, sizeof(user_frame_buffer_result));
@@ -177,7 +183,7 @@ void camera_start(void)
     rect.vw = VIDEO_PIXEL_VW;
     rect.hs = 0;
     rect.hw = VIDEO_PIXEL_HW;
-    Display.Graphics_Read_Setting(
+    Display_0.Graphics_Read_Setting(
         DisplayBase::GRAPHICS_LAYER_2,
         (void *)user_frame_buffer_result,
         RESULT_BUFFER_STRIDE,
@@ -185,18 +191,62 @@ void camera_start(void)
         DisplayBase::WR_RD_WRSWA_32_16BIT,
         &rect
     );
-    Display.Graphics_Start(DisplayBase::GRAPHICS_LAYER_2);
+    Display_0.Graphics_Start(DisplayBase::GRAPHICS_LAYER_2);
 
     Thread::wait(50);
     EasyAttach_LcdBacklight(true);
 #endif
 }
 
+/* Starts the camera */
+void camera_start_1(void)
+{
+    // Initialize the background to black
+    for (int i = 0; i < sizeof(FrameBuffer_Video_1); i += 2) {
+        FrameBuffer_Video_1[i + 0] = 0x10;
+        FrameBuffer_Video_1[i + 1] = 0x80;
+    }
+
+    // Camera
+#if ASPECT_RATIO_16_9
+    EasyAttach_Init(Display_1, 640, 360);  //aspect ratio 16:9
+#else
+    EasyAttach_Init(Display_1);            //aspect ratio 4:3
+#endif
+
+    // Video capture setting (progressive form fixed)
+    Display_1.Video_Write_Setting(
+        DisplayBase::VIDEO_INPUT_CHANNEL_1,
+        DisplayBase::COL_SYS_NTSC_358,
+        (void *)FrameBuffer_Video_1,
+        FRAME_BUFFER_STRIDE,
+        VIDEO_FORMAT,
+        WR_RD_WRSWA,
+        VIDEO_PIXEL_VW,
+        VIDEO_PIXEL_HW
+    );
+    EasyAttach_CameraStart(Display_1, DisplayBase::VIDEO_INPUT_CHANNEL_1);
+}
+
 /* Takes a video frame */
-void create_gray(Mat &img_gray)
+void create_gray_0(Mat &img_gray)
 {
     // Transform buffer into OpenCV matrix
-    Mat img_yuv(VIDEO_PIXEL_VW, VIDEO_PIXEL_HW, CV_8UC2, FrameBuffer_Video);
+    Mat img_yuv(VIDEO_PIXEL_VW, VIDEO_PIXEL_HW, CV_8UC2, FrameBuffer_Video_0);
+
+    // Convert from YUV422 to grayscale
+    // [Note] Although the camera spec says the color space is YUV422,
+    // using the color conversion code COLOR_YUV2GRAY_YUY2 gives
+    // better result than using COLOR_YUV2GRAY_Y422
+    // (Confirm by saving an image to SD card and then viewing it on PC.)
+    cvtColor(img_yuv, img_gray, COLOR_YUV2GRAY_YUY2);
+}
+
+/* Takes a video frame */
+void create_gray_1(Mat &img_gray)
+{
+    // Transform buffer into OpenCV matrix
+    Mat img_yuv(VIDEO_PIXEL_VW, VIDEO_PIXEL_HW, CV_8UC2, FrameBuffer_Video_1);
 
     // Convert from YUV422 to grayscale
     // [Note] Although the camera spec says the color space is YUV422,

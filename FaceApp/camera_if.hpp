@@ -64,14 +64,16 @@
 * @param	None
 * @return	None
 */
-void camera_start(void);
+void camera_start_0(void);
+void camera_start_1(void);
 
 /**
 * @brief	Create jpeg from yuv image
 * @param	None
 * @return	jpeg size
 */
-size_t create_jpeg();
+size_t create_jpeg_0();
+size_t create_jpeg_1();
 
 /**
 * @brief	Return jpeg addresse
@@ -85,7 +87,8 @@ uint8_t* get_jpeg_adr();
 * @param	img_gray	Grayscale video frame
 * @return	None
 */
-void create_gray(cv::Mat &img_gray);
+void create_gray_0(cv::Mat &img_gray);
+void create_gray_1(cv::Mat &img_gray);
 
 #if MBED_CONF_APP_LCD
 void ClearSquare(void);
