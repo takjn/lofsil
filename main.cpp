@@ -63,14 +63,14 @@ int projection_0(double Xw, double Yw,double Zw, int &u, int &v)
 
     // camera0 : rad = 0
     double Xc = Xw;
-    double Yc = Yw;
+    double Yc = -Yw;
     double Zc = Zw;
 
     // Perspective projection
-    Yc -= CAMERA_0_DISTANCE;
+    Zc -= CAMERA_0_DISTANCE;
   
-    u = CAMERA_0_CENTER_U - (int)((Xc/Yc)*(CAMERA_0_FX));
-    v = CAMERA_0_CENTER_V - (int)((Zc/Yc)*(CAMERA_0_FY));
+    u = CAMERA_0_CENTER_U - (int)((Xc/Zc)*(CAMERA_0_FX));
+    v = CAMERA_0_CENTER_V - (int)((Yc/Zc)*(CAMERA_0_FY));
 
     return (u>0 && u<VIDEO_PIXEL_HW && v>0 && v<VIDEO_PIXEL_VW);
 }
@@ -84,15 +84,15 @@ int projection_1(double Xw, double Yw,double Zw, int &u, int &v)
     // double Zc = Zw;
 
     // camera0 : rad = 0
-    double Xc = Yw;
-    double Yc = -Xw;
-    double Zc = Zw;
+    double Xc = Zw;
+    double Yc = -Yw;
+    double Zc = -Xw;
 
     // Perspective projection
-    Yc -= CAMERA_1_DISTANCE;
+    Zc -= CAMERA_1_DISTANCE;
   
-    u = CAMERA_1_CENTER_U - (int)((Xc/Yc)*(CAMERA_1_FX));
-    v = CAMERA_1_CENTER_V - (int)((Zc/Yc)*(CAMERA_1_FY));
+    u = CAMERA_1_CENTER_U - (int)((Xc/Zc)*(CAMERA_1_FX));
+    v = CAMERA_1_CENTER_V - (int)((Yc/Zc)*(CAMERA_1_FY));
 
     return (u>0 && u<VIDEO_PIXEL_HW && v>0 && v<VIDEO_PIXEL_VW);
 }
@@ -110,9 +110,6 @@ void shape_from_silhouette() {
     cv::absdiff(img_silhouette_1, img_background_1, img_silhouette_1);
 
     // Get a silhouette
-    // #define SILHOUETTE_THRESH_BINARY 30     // threshold value for silhouette detection
-    // cv::threshold(img_silhouette_0, img_silhouette_0, SILHOUETTE_THRESH_BINARY, 255, cv::THRESH_BINARY);
-    // cv::threshold(img_silhouette_1, img_silhouette_1, SILHOUETTE_THRESH_BINARY, 255, cv::THRESH_BINARY);
     cv::threshold(img_silhouette_0, img_silhouette_0, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
     cv::threshold(img_silhouette_1, img_silhouette_1, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
