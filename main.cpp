@@ -23,9 +23,6 @@ using namespace cv;
 #define CAMERA_1_FX 220.0       // Focal length(fx)
 #define CAMERA_1_FY 220.0       // Focal length(fy)
 
-// 3D reconstruction Parameters
-#define SILHOUETTE_THRESH_BINARY 30     // threshold value for silhouette detection
-
 /* Application variables */
 PointCloud point_cloud; // Point cloud (3D reconstruction result)
 
@@ -73,7 +70,7 @@ int projection_0(double Xw, double Yw,double Zw, int &u, int &v)
     Yc -= CAMERA_0_DISTANCE;
   
     u = CAMERA_0_CENTER_U - (int)((Xc/Yc)*(CAMERA_0_FX));
-    v = VIDEO_PIXEL_VW - (CAMERA_0_CENTER_V - (int)((Zc/Yc)*(CAMERA_0_FY)));
+    v = CAMERA_0_CENTER_V - (int)((Zc/Yc)*(CAMERA_0_FY));
 
     return (u>0 && u<VIDEO_PIXEL_HW && v>0 && v<VIDEO_PIXEL_VW);
 }
@@ -87,15 +84,15 @@ int projection_1(double Xw, double Yw,double Zw, int &u, int &v)
     // double Zc = Zw;
 
     // camera0 : rad = 0
-    double Xc = Yw;     // or -Yw
-    double Yc = -Xw;    // or Xw
+    double Xc = Yw;
+    double Yc = -Xw;
     double Zc = Zw;
 
     // Perspective projection
     Yc -= CAMERA_1_DISTANCE;
   
     u = CAMERA_1_CENTER_U - (int)((Xc/Yc)*(CAMERA_1_FX));
-    v = VIDEO_PIXEL_VW - (CAMERA_1_CENTER_V - (int)((Zc/Yc)*(CAMERA_1_FY)));
+    v = CAMERA_1_CENTER_V - (int)((Zc/Yc)*(CAMERA_1_FY));
 
     return (u>0 && u<VIDEO_PIXEL_HW && v>0 && v<VIDEO_PIXEL_VW);
 }
@@ -113,8 +110,11 @@ void shape_from_silhouette() {
     cv::absdiff(img_silhouette_1, img_background_1, img_silhouette_1);
 
     // Get a silhouette
-    cv::threshold(img_silhouette_0, img_silhouette_0, SILHOUETTE_THRESH_BINARY, 255, cv::THRESH_BINARY);
-    cv::threshold(img_silhouette_1, img_silhouette_1, SILHOUETTE_THRESH_BINARY, 255, cv::THRESH_BINARY);
+    // #define SILHOUETTE_THRESH_BINARY 30     // threshold value for silhouette detection
+    // cv::threshold(img_silhouette_0, img_silhouette_0, SILHOUETTE_THRESH_BINARY, 255, cv::THRESH_BINARY);
+    // cv::threshold(img_silhouette_1, img_silhouette_1, SILHOUETTE_THRESH_BINARY, 255, cv::THRESH_BINARY);
+    cv::threshold(img_silhouette_0, img_silhouette_0, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+    cv::threshold(img_silhouette_1, img_silhouette_1, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
     // Check each voxels
     double xx,yy,zz;    // 3D point(x,y,z)
@@ -132,12 +132,19 @@ void shape_from_silhouette() {
                     
                 // Project a 3D point into camera0 coordinates
                 if (projection_0(xx, yy, zz, u, v)) {
-                    if (img_silhouette_0.at<unsigned char>(v, u)) {
+                    
+                    // if (img_silhouette_0.at<unsigned char>(v, u)) {
+                    unsigned char *src0 = img_silhouette_0.ptr<unsigned char>(v);
+                    if (src0[u]) {
 
                         // Project a 3D point into camera1 coordinates
                         if (projection_1(xx, yy, zz, u, v)) {
-                            if (img_silhouette_1.at<unsigned char>(v, u)) {
+
+                            // if (img_silhouette_1.at<unsigned char>(v, u)) {
+                            unsigned char *src1 = img_silhouette_1.ptr<unsigned char>(v);
+                            if (src1[u]) {
                                 // Keep the point because it is inside the shilhouette
+                                point_cloud.set(pcd_index, 1);
                             }
                             else {
                                 // Delete the point because it is outside the shilhouette
@@ -205,7 +212,6 @@ int main() {
             set_background();
         }
 
-        point_cloud.clear();
         shape_from_silhouette();
 
         led2 = 1 - led2;
