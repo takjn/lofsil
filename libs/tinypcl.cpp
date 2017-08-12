@@ -56,9 +56,9 @@ void PointCloud::set(unsigned int x, unsigned int y, unsigned int z, unsigned ch
 
 // Clear all points
 void PointCloud::clear(void) {
-    for (int z=0;z<SIZE;z++) {
-        for (int y=0;y<SIZE;y++) {
-            for (int x=0;x<SIZE;x++) {
+    for (int z=0;z<SIZE_Z;z++) {
+        for (int y=0;y<SIZE_Y;y++) {
+            for (int x=0;x<SIZE_X;x++) {
                 point_cloud_data(x,y,z) = 1;
             }
         }
@@ -69,9 +69,9 @@ void PointCloud::clear(void) {
 void PointCloud::save_as_xyz(const char* file_name) {
     FILE *fp_xyz = fopen(file_name, "w");
 
-    for (int z=0; z<SIZE; z++) {
-        for (int y=0; y<SIZE; y++) {
-            for (int x=0; x<SIZE; x++) {
+    for (int z=0; z<SIZE_Z; z++) {
+        for (int y=0; y<SIZE_Y; y++) {
+            for (int x=0; x<SIZE_Z; x++) {
                 if (point_cloud_data(x,y,z) == 1) {
 
                     // Write a 3D point

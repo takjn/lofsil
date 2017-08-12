@@ -12,16 +12,16 @@ using namespace cv;
 
 // Intrinsic parameters of the camera (cf. OpenCV's Camera Calibration)
 #define CAMERA_0_DISTANCE 130
-#define CAMERA_0_CENTER_U 160   // Optical centers (cx)
-#define CAMERA_0_CENTER_V 120   // Optical centers (cy)
-#define CAMERA_0_FX 220.0       // Focal length(fx)
-#define CAMERA_0_FY 220.0       // Focal length(fy)
+#define CAMERA_0_CENTER_U 173   // Optical centers (cx)
+#define CAMERA_0_CENTER_V 116   // Optical centers (cy)
+#define CAMERA_0_FX 242.0       // Focal length(fx)
+#define CAMERA_0_FY 240.0       // Focal length(fy)
 
 #define CAMERA_1_DISTANCE 110
-#define CAMERA_1_CENTER_U 160   // Optical centers (cx)
-#define CAMERA_1_CENTER_V 120   // Optical centers (cy)
-#define CAMERA_1_FX 220.0       // Focal length(fx)
-#define CAMERA_1_FY 220.0       // Focal length(fy)
+#define CAMERA_1_CENTER_U 156   // Optical centers (cx)
+#define CAMERA_1_CENTER_V 115   // Optical centers (cy)
+#define CAMERA_1_FX 239.4       // Focal length(fx)
+#define CAMERA_1_FY 245.0       // Focal length(fy)
 
 /* Application variables */
 PointCloud point_cloud; // Point cloud (3D reconstruction result)
@@ -121,14 +121,14 @@ void shape_from_silhouette() {
     int u,v;            // camera coordinates(x,y)
     int pcd_index=0;
 
-    zz = (-point_cloud.SIZE / 2) * point_cloud.SCALE;
-    for (int z=0; z<point_cloud.SIZE; z++, zz += point_cloud.SCALE) {
+    zz = (-point_cloud.SIZE_Z / 2) * point_cloud.SCALE;
+    for (int z=0; z<point_cloud.SIZE_Z; z++, zz += point_cloud.SCALE) {
 
-        yy = (-point_cloud.SIZE / 2) * point_cloud.SCALE;
-        for (int y=0; y<point_cloud.SIZE; y++, yy += point_cloud.SCALE) {
+        yy = (-point_cloud.SIZE_Y / 2) * point_cloud.SCALE;
+        for (int y=0; y<point_cloud.SIZE_Y; y++, yy += point_cloud.SCALE) {
 
-            xx = (-point_cloud.SIZE / 2) * point_cloud.SCALE;
-            for (int x=0; x<point_cloud.SIZE; x++, xx += point_cloud.SCALE, pcd_index++) {
+            xx = (-point_cloud.SIZE_X / 2) * point_cloud.SCALE;
+            for (int x=0; x<point_cloud.SIZE_X; x++, xx += point_cloud.SCALE, pcd_index++) {
                     
                 // Project a 3D point into camera0 coordinates
                 if (projection_0(xx, yy, zz, u, v)) {
@@ -188,9 +188,9 @@ int main() {
     set_background();
 
     while (1) {
-        storage.wait_connect();
-
         if (button0 == 0) {
+            storage.wait_connect();
+
             // 背景画像の保存
             printf("Saving background images...");
             cv::imwrite("/storage/img_background_0.bmp", img_background_0);
@@ -207,9 +207,6 @@ int main() {
             point_cloud.save_as_xyz(file_name);
             printf("done\r\n");
             reconst_index++;
-
-
-            set_background();
         }
 
         shape_from_silhouette();

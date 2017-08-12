@@ -31,15 +31,19 @@
 using std::bitset;
 
 //  3D grid size
-#define PCD_SIZE 100     // size
-#define PCD_SCALE 1.0    // resolution(mm/grid)
+#define PCD_SIZE_X 80     // size
+#define PCD_SIZE_Y 80     // size
+#define PCD_SIZE_Z 80     // size
+#define PCD_SCALE  2.0    // resolution(mm/grid)
 
 // Syntax sugar to access voxels
-#define point_cloud_data(x,y,z)  point_cloud_data[(x) + ((y)*PCD_SIZE) + (PCD_SIZE*PCD_SIZE*(z))]
+#define point_cloud_data(x,y,z)  point_cloud_data[(x) + ((y)*PCD_SIZE_X) + (PCD_SIZE_X*PCD_SIZE_Y*(z))]
 
 class PointCloud {
 public:
-    const static int SIZE = PCD_SIZE;
+    const static int SIZE_X = PCD_SIZE_X;
+    const static int SIZE_Y = PCD_SIZE_Y;
+    const static int SIZE_Z = PCD_SIZE_Z;
     const static float SCALE = PCD_SCALE;
 
     PointCloud(void);
@@ -52,7 +56,7 @@ public:
     void save_as_xyz(const char*);
 private:
     // 3D grid representing object space
-    bitset<PCD_SIZE*PCD_SIZE*PCD_SIZE> point_cloud_data;
+    bitset<PCD_SIZE_X*PCD_SIZE_Y*PCD_SIZE_Z> point_cloud_data;
 };
 
 #endif
