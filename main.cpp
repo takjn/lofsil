@@ -214,7 +214,7 @@ int main() {
     printf("IP Address is %s\n\r", eth.get_ip_address());
 
     // Create a websocket instance
-    Websocket ws("ws://192.168.0.6:1880/ws/position", &eth);
+    Websocket ws("ws://192.168.0.6:1880/ws/pointcloud", &eth);
     int connect_error = ws.connect();
     
     printf("Camera Test\r\n");
@@ -259,12 +259,27 @@ int main() {
         }
 
         shape_from_silhouette();
-        get_position(x, y, z);
+        // get_position(x, y, z);
 
-        char buf[256];
-        sprintf(buf, "{\"x\":%d,\"y\":%d,\"z\":%d}", x, y, z);
+        // char buf[128];
+        // sprintf(buf, "{\"x\":%d,\"y\":%d,\"z\":%d}", x, y, z);
+        // int error_c = ws.send(buf);
 
-        int error_c = ws.send(buf);
+        char buf[128];
+        int pcd_index = 0;
+        for (int z=0; z<point_cloud.SIZE_Z; z++) {
+            for (int y=0; y<point_cloud.SIZE_Y; y++) {
+                for (int x=0; x<point_cloud.SIZE_X; x++, pcd_index++) {
+    
+                    if ( point_cloud.get(pcd_index)) {
+                        sprintf(buf, "%d %d %d", x, y, z);
+                        int error_c = ws.send(buf);
+                    }
+                }
+            }
+        }
+        int error_c = ws.send("end");
+    
 
         led2 = 1 - led2;
 

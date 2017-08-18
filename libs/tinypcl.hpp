@@ -31,10 +31,10 @@
 using std::bitset;
 
 //  3D grid size
-#define PCD_SIZE_X 50     // size
-#define PCD_SIZE_Y 20     // size
-#define PCD_SIZE_Z 50     // size
-#define PCD_SCALE  2.0    // resolution(mm/grid)
+#define PCD_SIZE_X 25     // size
+#define PCD_SIZE_Y 10     // size
+#define PCD_SIZE_Z 25     // size
+#define PCD_SCALE  10.0    // resolution(mm/grid)
 
 // Syntax sugar to access voxels
 #define point_cloud_data(x,y,z)  point_cloud_data[(x) + ((y)*PCD_SIZE_X) + (PCD_SIZE_X*PCD_SIZE_Y*(z))]
