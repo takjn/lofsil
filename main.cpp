@@ -15,16 +15,16 @@ using namespace cv;
 
 // Intrinsic parameters of the camera (cf. OpenCV's Camera Calibration)
 #define CAMERA_0_DISTANCE 130
-#define CAMERA_0_CENTER_U 173   // Optical centers (cx)
-#define CAMERA_0_CENTER_V 116   // Optical centers (cy)
-#define CAMERA_0_FX 242.0       // Focal length(fx)
-#define CAMERA_0_FY 240.0       // Focal length(fy)
+#define CAMERA_0_CENTER_U 87   // Optical centers (cx)
+#define CAMERA_0_CENTER_V 58   // Optical centers (cy)
+#define CAMERA_0_FX 121.0      // Focal length(fx)
+#define CAMERA_0_FY 120.0      // Focal length(fy)
 
 #define CAMERA_1_DISTANCE 110
-#define CAMERA_1_CENTER_U 156   // Optical centers (cx)
-#define CAMERA_1_CENTER_V 115   // Optical centers (cy)
-#define CAMERA_1_FX 239.4       // Focal length(fx)
-#define CAMERA_1_FY 245.0       // Focal length(fy)
+#define CAMERA_1_CENTER_U 78   // Optical centers (cx)
+#define CAMERA_1_CENTER_V 58   // Optical centers (cy)
+#define CAMERA_1_FX 119.2      // Focal length(fx)
+#define CAMERA_1_FY 122.5      // Focal length(fy)
 
 /* Application variables */
 PointCloud point_cloud; // Point cloud (3D reconstruction result)

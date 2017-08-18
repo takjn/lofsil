@@ -51,8 +51,8 @@
   #define ASPECT_RATIO_16_9    (1)
   #endif
 #else
-  #define VIDEO_PIXEL_HW       (320u)  /* QVGA */
-  #define VIDEO_PIXEL_VW       (240u)  /* QVGA */
+  #define VIDEO_PIXEL_HW       (160u)  /* QVGA */
+  #define VIDEO_PIXEL_VW       (120u)  /* QVGA */
 #endif
 
 #define FRAME_BUFFER_STRIDE    (((VIDEO_PIXEL_HW * DATA_SIZE_PER_PIC) + 31u) & ~31u)
