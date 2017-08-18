@@ -6,6 +6,9 @@
 #include "DisplayApp.h"
 #include "tinypcl.hpp"
 
+#include "EthernetInterface.h"
+#include "Websocket.h"
+
 using namespace cv;
 
 #define DBG_PCMONITOR (1)
@@ -166,13 +169,14 @@ void shape_from_silhouette() {
     }
 }
 
-void get_position() {
+void get_position(int &pos_x, int &pos_y, int &pos_z) {
 
     // Check each voxels
+    pos_x=0;
+    pos_y=0;
+    pos_z=0;
+
     int pcd_index=0;
-    int pos_x=0;
-    int pos_y=0;
-    int pos_z=0;
     int count=0;
 
     for (int z=0; z<point_cloud.SIZE_Z; z++) {
@@ -189,17 +193,30 @@ void get_position() {
         }
     }
 
-    if (count>100) {
+    if (count>200) {
         pos_x /=count;
         pos_y /=count;
         pos_z /=count;
 
-        printf("%d, %d, %d\r\n", pos_x, pos_y, pos_z);
+        // printf("%d, %d, %d\r\n", pos_x, pos_y, pos_z);
     }
 
 }
 
 int main() {
+
+    // announce
+    printf("Websocket Example v1.0.0\r\n");
+    
+    // Create a network interface and connect
+    EthernetInterface eth;
+    eth.connect();
+    printf("IP Address is %s\n\r", eth.get_ip_address());
+
+    // Create a websocket instance
+    Websocket ws("ws://192.168.0.6:1880/ws/position", &eth);
+    int connect_error = ws.connect();
+    
     printf("Camera Test\r\n");
 
     // Camera
@@ -216,6 +233,8 @@ int main() {
     led3 = 1;
 
     set_background();
+
+    int x,y,z;
 
     while (1) {
         if (button0 == 0) {
@@ -240,7 +259,12 @@ int main() {
         }
 
         shape_from_silhouette();
-        get_position();
+        get_position(x, y, z);
+
+        char buf[256];
+        sprintf(buf, "{\"x\":%d,\"y\":%d,\"z\":%d}", x, y, z);
+
+        int error_c = ws.send(buf);
 
         led2 = 1 - led2;
 
