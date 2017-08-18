@@ -166,6 +166,39 @@ void shape_from_silhouette() {
     }
 }
 
+void get_position() {
+
+    // Check each voxels
+    int pcd_index=0;
+    int pos_x=0;
+    int pos_y=0;
+    int pos_z=0;
+    int count=0;
+
+    for (int z=0; z<point_cloud.SIZE_Z; z++) {
+        for (int y=0; y<point_cloud.SIZE_Y; y++) {
+            for (int x=0; x<point_cloud.SIZE_X; x++, pcd_index++) {
+
+                if ( point_cloud.get(pcd_index)) {
+                    pos_x += x;
+                    pos_y += y;
+                    pos_z += z;
+                    count++;
+                }
+            }
+        }
+    }
+
+    if (count>100) {
+        pos_x /=count;
+        pos_y /=count;
+        pos_z /=count;
+
+        printf("%d, %d, %d\r\n", pos_x, pos_y, pos_z);
+    }
+
+}
+
 int main() {
     printf("Camera Test\r\n");
 
@@ -207,6 +240,7 @@ int main() {
         }
 
         shape_from_silhouette();
+        get_position();
 
         led2 = 1 - led2;
 
