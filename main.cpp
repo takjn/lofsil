@@ -210,10 +210,6 @@ int main() {
 
     // SD & USB
     SdUsbConnect storage("storage");
-    printf("Finding a storage...");
-    // wait for the storage device to be connected
-    storage.wait_connect();
-    printf("done\r\n");
     led3 = 1;
 
     set_background();
@@ -221,8 +217,11 @@ int main() {
 
     while (1) {
         if (button0 == 0) {
+            printf("Finding a storage...");
+            // wait for the storage device to be connected
             storage.wait_connect();
-
+            printf("done\r\n");
+        
             // 背景画像の保存
             printf("Saving background images...");
             cv::imwrite("/storage/img_background_0.bmp", img_background_0);
