@@ -31,6 +31,10 @@ using namespace cv;
 #define CAMERA_1_FX 119.2      // Focal length(fx)
 #define CAMERA_1_FY 122.5      // Focal length(fy)
 
+// pre-calculation table
+int camera_0_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z][3];
+int camera_1_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z][3];
+
 /* Application variables */
 Mat img_background_0;   // background image for NTSC-1A
 Mat img_background_1;   // background image for NTSC-2A
@@ -103,6 +107,36 @@ int projection_1(double Xw, double Yw,double Zw, int &u, int &v)
     return (u>0 && u<VIDEO_PIXEL_HW && v>0 && v<VIDEO_PIXEL_VW);
 }
 
+// Pre-caluation
+void precalc() {
+    double xx,yy,zz;    // 3D point(x,y,z)
+    int u,v;            // camera coordinates(x,y)
+    int ret;
+
+    zz = (-GRID_SIZE_Z / 2) * GRID_SCALE;
+    for (int z=0; z<GRID_SIZE_Z; z++, zz += GRID_SCALE) {
+
+        yy = (-GRID_SIZE_Y / 2) * GRID_SCALE;
+        for (int y=0; y<GRID_SIZE_Y; y++, yy += GRID_SCALE) {
+
+            xx = (-GRID_SIZE_X / 2) * GRID_SCALE;
+            for (int x=0; x<GRID_SIZE_X; x++, xx += GRID_SCALE) {
+
+                ret = projection_0(xx, yy, zz, u, v);
+                camera_0_table[x][y][z][0] = u;
+                camera_0_table[x][y][z][1] = v;
+                camera_0_table[x][y][z][2] = ret;
+                
+                ret = projection_1(xx, yy, zz, u, v);
+                camera_1_table[x][y][z][0] = u;
+                camera_1_table[x][y][z][1] = v;
+                camera_1_table[x][y][z][2] = ret;
+
+            }
+        }
+    }
+}
+
 // Voxel based "Shape from silhouette"
 // Only voxels that lie inside all silhouette volumes remain part of the final shape.
 void shape_from_silhouette(Websocket *ws) {
@@ -120,32 +154,25 @@ void shape_from_silhouette(Websocket *ws) {
     cv::threshold(img_silhouette_1, img_silhouette_1, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
     // Check each voxels
-    double xx,yy,zz;    // 3D point(x,y,z)
-    int u,v;            // camera coordinates(x,y)
     char buf[128];
 
-    zz = (-GRID_SIZE_Z / 2) * GRID_SCALE;
-    for (int z=0; z<GRID_SIZE_Z; z++, zz += GRID_SCALE) {
-
-        yy = (-GRID_SIZE_Y / 2) * GRID_SCALE;
-        for (int y=0; y<GRID_SIZE_Y; y++, yy += GRID_SCALE) {
-
-            xx = (-GRID_SIZE_X / 2) * GRID_SCALE;
-            for (int x=0; x<GRID_SIZE_X; x++, xx += GRID_SCALE) {
+    for (int z=0; z<GRID_SIZE_Z; z++) {
+        for (int y=0; y<GRID_SIZE_Y; y++) {
+            for (int x=0; x<GRID_SIZE_X; x++) {
                     
                 // Project a 3D point into camera0 coordinates
-                if (projection_0(xx, yy, zz, u, v)) {
+                if (camera_0_table[x][y][z][2]) {
                     
                     // if (img_silhouette_0.at<unsigned char>(v, u)) {
-                    unsigned char *src0 = img_silhouette_0.ptr<unsigned char>(v);
-                    if (src0[u]) {
+                    unsigned char *src0 = img_silhouette_0.ptr<unsigned char>(camera_0_table[x][y][z][1]);
+                    if (src0[camera_0_table[x][y][z][0]]) {
 
                         // Project a 3D point into camera1 coordinates
-                        if (projection_1(xx, yy, zz, u, v)) {
+                        if (camera_1_table[x][y][z][2]) {
 
                             // if (img_silhouette_1.at<unsigned char>(v, u)) {
-                            unsigned char *src1 = img_silhouette_1.ptr<unsigned char>(v);
-                            if (src1[u]) {
+                            unsigned char *src1 = img_silhouette_1.ptr<unsigned char>(camera_1_table[x][y][z][1]);
+                            if (src1[camera_1_table[x][y][z][0]]) {
                                 // Keep the point because it is inside the shilhouette
                                 sprintf(buf, "%d %d %d", x, y, z);
                                 int error_c = ws->send(buf);
@@ -168,7 +195,7 @@ int main() {
     // Create a network interface and connect
     EthernetInterface eth;
     eth.connect();
-    printf("IP Address is %s\n\r", eth.get_ip_address());
+    printf("IP Address is %s\r\n", eth.get_ip_address());
 
     // Create a websocket instance
     Websocket ws("ws://192.168.0.6:1880/ws/pointcloud", &eth);
@@ -186,10 +213,11 @@ int main() {
     printf("Finding a storage...");
     // wait for the storage device to be connected
     storage.wait_connect();
-    printf("done\n");
+    printf("done\r\n");
     led3 = 1;
 
     set_background();
+    precalc();
 
     while (1) {
         if (button0 == 0) {
