@@ -62,7 +62,7 @@ void set_background() {
 // Projects a 3D point into camera0 coordinates
 int projection_0(double Xw, double Yw,double Zw, int &u, int &v)
 {
-    // // rotate around the Z axis
+    // // rotate around the Y axis
     // double Xc = cos(rad)*Xw + sin(rad)*Yw;
     // double Yc =-sin(rad)*Xw + cos(rad)*Yw;
     // double Zc = Zw;
@@ -84,7 +84,7 @@ int projection_0(double Xw, double Yw,double Zw, int &u, int &v)
 // Projects a 3D point into camera1 coordinates
 int projection_1(double Xw, double Yw,double Zw, int &u, int &v)
 {
-    // // rotate around the Z axis
+    // // rotate around the Y axis
     // double Xc = cos(rad)*Xw + sin(rad)*Yw;
     // double Yc =-sin(rad)*Xw + cos(rad)*Yw;
     // double Zc = Zw;
@@ -122,7 +122,6 @@ void shape_from_silhouette(Websocket *ws) {
     // Check each voxels
     double xx,yy,zz;    // 3D point(x,y,z)
     int u,v;            // camera coordinates(x,y)
-    int pcd_index=0;
     char buf[128];
 
     zz = (-GRID_SIZE_Z / 2) * GRID_SCALE;
@@ -132,7 +131,7 @@ void shape_from_silhouette(Websocket *ws) {
         for (int y=0; y<GRID_SIZE_Y; y++, yy += GRID_SCALE) {
 
             xx = (-GRID_SIZE_X / 2) * GRID_SCALE;
-            for (int x=0; x<GRID_SIZE_X; x++, xx += GRID_SCALE, pcd_index++) {
+            for (int x=0; x<GRID_SIZE_X; x++, xx += GRID_SCALE) {
                     
                 // Project a 3D point into camera0 coordinates
                 if (projection_0(xx, yy, zz, u, v)) {
