@@ -4,7 +4,6 @@
 #include "opencv.hpp"
 #include "camera_if.hpp"
 #include "DisplayApp.h"
-#include "tinypcl.hpp"
 
 #include "EthernetInterface.h"
 #include "Websocket.h"
@@ -12,6 +11,12 @@
 using namespace cv;
 
 #define DBG_PCMONITOR (1)
+
+//  3D grid size
+#define GRID_SIZE_X 45     // size
+#define GRID_SIZE_Y 45     // size
+#define GRID_SIZE_Z 25     // size
+#define GRID_SCALE  5.0    // resolution(mm/grid)
 
 // Intrinsic parameters of the camera (cf. OpenCV's Camera Calibration)
 #define CAMERA_0_DISTANCE 130
@@ -27,8 +32,6 @@ using namespace cv;
 #define CAMERA_1_FY 122.5      // Focal length(fy)
 
 /* Application variables */
-PointCloud point_cloud; // Point cloud (3D reconstruction result)
-
 Mat img_background_0;   // background image for NTSC-1A
 Mat img_background_1;   // background image for NTSC-2A
 
@@ -102,7 +105,7 @@ int projection_1(double Xw, double Yw,double Zw, int &u, int &v)
 
 // Voxel based "Shape from silhouette"
 // Only voxels that lie inside all silhouette volumes remain part of the final shape.
-void shape_from_silhouette() {
+void shape_from_silhouette(Websocket *ws) {
 
     // Take a silhouette
     create_gray_0(img_silhouette_0);
@@ -120,15 +123,16 @@ void shape_from_silhouette() {
     double xx,yy,zz;    // 3D point(x,y,z)
     int u,v;            // camera coordinates(x,y)
     int pcd_index=0;
+    char buf[128];
 
-    zz = (-point_cloud.SIZE_Z / 2) * point_cloud.SCALE;
-    for (int z=0; z<point_cloud.SIZE_Z; z++, zz += point_cloud.SCALE) {
+    zz = (-GRID_SIZE_Z / 2) * GRID_SCALE;
+    for (int z=0; z<GRID_SIZE_Z; z++, zz += GRID_SCALE) {
 
-        yy = (-point_cloud.SIZE_Y / 2) * point_cloud.SCALE;
-        for (int y=0; y<point_cloud.SIZE_Y; y++, yy += point_cloud.SCALE) {
+        yy = (-GRID_SIZE_Y / 2) * GRID_SCALE;
+        for (int y=0; y<GRID_SIZE_Y; y++, yy += GRID_SCALE) {
 
-            xx = (-point_cloud.SIZE_X / 2) * point_cloud.SCALE;
-            for (int x=0; x<point_cloud.SIZE_X; x++, xx += point_cloud.SCALE, pcd_index++) {
+            xx = (-GRID_SIZE_X / 2) * GRID_SCALE;
+            for (int x=0; x<GRID_SIZE_X; x++, xx += GRID_SCALE, pcd_index++) {
                     
                 // Project a 3D point into camera0 coordinates
                 if (projection_0(xx, yy, zz, u, v)) {
@@ -144,63 +148,17 @@ void shape_from_silhouette() {
                             unsigned char *src1 = img_silhouette_1.ptr<unsigned char>(v);
                             if (src1[u]) {
                                 // Keep the point because it is inside the shilhouette
-                                point_cloud.set(pcd_index, 1);
-                            }
-                            else {
-                                // Delete the point because it is outside the shilhouette
-                                point_cloud.set(pcd_index, 0);
+                                sprintf(buf, "%d %d %d", x, y, z);
+                                int error_c = ws->send(buf);
                             }
                         }
-                        else {
-                            // Delete the point because it is outside the camera image
-                            point_cloud.set(pcd_index, 0);
-                        }
                     }
-                    else {
-                        // Delete the point because it is outside the shilhouette
-                        point_cloud.set(pcd_index, 0);
-                    }
-                } else {
-                    // Delete the point because it is outside the camera image
-                    point_cloud.set(pcd_index, 0);
-                }
-            }
-        }
-    }
-}
-
-void get_position(int &pos_x, int &pos_y, int &pos_z) {
-
-    // Check each voxels
-    pos_x=0;
-    pos_y=0;
-    pos_z=0;
-
-    int pcd_index=0;
-    int count=0;
-
-    for (int z=0; z<point_cloud.SIZE_Z; z++) {
-        for (int y=0; y<point_cloud.SIZE_Y; y++) {
-            for (int x=0; x<point_cloud.SIZE_X; x++, pcd_index++) {
-
-                if ( point_cloud.get(pcd_index)) {
-                    pos_x += x;
-                    pos_y += y;
-                    pos_z += z;
-                    count++;
                 }
             }
         }
     }
 
-    if (count>200) {
-        pos_x /=count;
-        pos_y /=count;
-        pos_z /=count;
-
-        // printf("%d, %d, %d\r\n", pos_x, pos_y, pos_z);
-    }
-
+    int error_c = ws->send("end");
 }
 
 int main() {
@@ -234,8 +192,6 @@ int main() {
 
     set_background();
 
-    int x,y,z;
-
     while (1) {
         if (button0 == 0) {
             storage.wait_connect();
@@ -250,36 +206,9 @@ int main() {
             cv::imwrite("/storage/img_silhouette_0.bmp", img_silhouette_0);
             cv::imwrite("/storage/img_silhouette_1.bmp", img_silhouette_1);
             printf("done\r\n");
-
-            printf("Saving a xyz file...\r\n");
-            sprintf(file_name, "/storage/result_%d.xyz", reconst_index);
-            point_cloud.save_as_xyz(file_name);
-            printf("done\r\n");
-            reconst_index++;
         }
 
-        shape_from_silhouette();
-        // get_position(x, y, z);
-
-        // char buf[128];
-        // sprintf(buf, "{\"x\":%d,\"y\":%d,\"z\":%d}", x, y, z);
-        // int error_c = ws.send(buf);
-
-        char buf[128];
-        int pcd_index = 0;
-        for (int z=0; z<point_cloud.SIZE_Z; z++) {
-            for (int y=0; y<point_cloud.SIZE_Y; y++) {
-                for (int x=0; x<point_cloud.SIZE_X; x++, pcd_index++) {
-    
-                    if ( point_cloud.get(pcd_index)) {
-                        sprintf(buf, "%d %d %d", x, y, z);
-                        int error_c = ws.send(buf);
-                    }
-                }
-            }
-        }
-        int error_c = ws.send("end");
-    
+        shape_from_silhouette(&ws);
 
         led2 = 1 - led2;
 
