@@ -20,14 +20,14 @@ using namespace cv;
 
 // Intrinsic parameters of the camera (cf. OpenCV's Camera Calibration)
 #define CAMERA_0_DISTANCE 110
-#define CAMERA_0_RADIAN 0.785398    // 45 degree
+#define CAMERA_0_RADIAN 0.0    // 0 degree
 #define CAMERA_0_CENTER_U 87   // Optical centers (cx)
 #define CAMERA_0_CENTER_V 58   // Optical centers (cy)
 #define CAMERA_0_FX 121.0      // Focal length(fx)
 #define CAMERA_0_FY 120.0      // Focal length(fy)
 
 #define CAMERA_1_DISTANCE 110
-#define CAMERA_1_RADIAN -0.785398    // -45 degree
+#define CAMERA_1_RADIAN 1.5708 // 90 degree
 #define CAMERA_1_CENTER_U 78   // Optical centers (cx)
 #define CAMERA_1_CENTER_V 58   // Optical centers (cy)
 #define CAMERA_1_FX 119.2      // Focal length(fx)
