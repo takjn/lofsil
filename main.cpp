@@ -13,19 +13,21 @@ using namespace cv;
 #define DBG_PCMONITOR (1)
 
 //  3D grid size
-#define GRID_SIZE_X 45     // size
-#define GRID_SIZE_Y 45     // size
-#define GRID_SIZE_Z 25     // size
+#define GRID_SIZE_X 50     // size
+#define GRID_SIZE_Y 50     // size
+#define GRID_SIZE_Z 20     // size
 #define GRID_SCALE  5.0    // resolution(mm/grid)
 
 // Intrinsic parameters of the camera (cf. OpenCV's Camera Calibration)
-#define CAMERA_0_DISTANCE 130
+#define CAMERA_0_DISTANCE 110
+#define CAMERA_0_RADIAN 0.785398    // 45 degree
 #define CAMERA_0_CENTER_U 87   // Optical centers (cx)
 #define CAMERA_0_CENTER_V 58   // Optical centers (cy)
 #define CAMERA_0_FX 121.0      // Focal length(fx)
 #define CAMERA_0_FY 120.0      // Focal length(fy)
 
 #define CAMERA_1_DISTANCE 110
+#define CAMERA_1_RADIAN -0.785398    // -45 degree
 #define CAMERA_1_CENTER_U 78   // Optical centers (cx)
 #define CAMERA_1_CENTER_V 58   // Optical centers (cy)
 #define CAMERA_1_FX 119.2      // Focal length(fx)
@@ -66,15 +68,10 @@ void set_background() {
 // Projects a 3D point into camera0 coordinates
 int projection_0(double Xw, double Yw,double Zw, int &u, int &v)
 {
-    // // rotate around the Y axis
-    // double Xc = cos(rad)*Xw + sin(rad)*Yw;
-    // double Yc =-sin(rad)*Xw + cos(rad)*Yw;
-    // double Zc = Zw;
-
-    // camera0 : rad = 0
-    double Xc = Xw;
+    // rotate around the Y axis
+    double Xc = cos(CAMERA_0_RADIAN)*Xw + sin(CAMERA_0_RADIAN)*Zw;
     double Yc = -Yw;
-    double Zc = Zw;
+    double Zc =-sin(CAMERA_0_RADIAN)*Xw + cos(CAMERA_0_RADIAN)*Zw;
 
     // Perspective projection
     Zc -= CAMERA_0_DISTANCE;
@@ -88,15 +85,10 @@ int projection_0(double Xw, double Yw,double Zw, int &u, int &v)
 // Projects a 3D point into camera1 coordinates
 int projection_1(double Xw, double Yw,double Zw, int &u, int &v)
 {
-    // // rotate around the Y axis
-    // double Xc = cos(rad)*Xw + sin(rad)*Yw;
-    // double Yc =-sin(rad)*Xw + cos(rad)*Yw;
-    // double Zc = Zw;
-
-    // camera0 : rad = 0
-    double Xc = Zw;
+    // rotate around the Y axis
+    double Xc = cos(CAMERA_1_RADIAN)*Xw + sin(CAMERA_1_RADIAN)*Zw;
     double Yc = -Yw;
-    double Zc = -Xw;
+    double Zc =-sin(CAMERA_1_RADIAN)*Xw + cos(CAMERA_1_RADIAN)*Zw;
 
     // Perspective projection
     Zc -= CAMERA_1_DISTANCE;
