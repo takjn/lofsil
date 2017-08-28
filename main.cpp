@@ -190,7 +190,7 @@ int main() {
     printf("IP Address is %s\r\n", eth.get_ip_address());
 
     // Create a websocket instance
-    Websocket ws("ws://192.168.0.6:1880/ws/pointcloud", &eth);
+    Websocket ws("ws://192.168.0.7:1880/ws/pointcloud", &eth);
     int connect_error = ws.connect();
     
     printf("Camera Test\r\n");

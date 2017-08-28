@@ -15,6 +15,11 @@ USB0にUSBケーブルを接続してPC用アプリ [DisplayApp](https://develop
 ～参考ページ～  
 [がじぇっとるねさすコミュニティ GR-LYCHEE OpenCV](http://japan.renesasrulz.com/gr_user_forum_japanese/f/gr-lychee/4208/gr-lychee-opencv)
 
+## 実行方法
+```
+cd client && ruby -rwebrick -e 'WEBrick::HTTPServer.new(:DocumentRoot => "./", :Port => 8000).start'
+```
+
 ## node-red
 データを受信して位置情報、点群データ、3Dヒートマップに変換するためのnode-redフロー
 
