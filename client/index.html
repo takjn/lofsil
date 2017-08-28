@@ -1,0 +1,72 @@
+<html>
+
+<head>
+    <title>A-Frame Point Component - Star map</title>
+    <meta name="description" content="Using Point component for rendering very many points."></meta>
+    <script src="https://aframe.io/releases/0.6.1/aframe.min.js"></script>
+    <script src="./aframe-point-component.js"></script>
+</head>
+
+<body>
+    <a-scene>
+        <a-entity id='cameraWrapper' position="0 0 0">
+            <a-camera>
+            <a-entity id="myCursor" cursor="fuse:true; maxDistance:30; timeout:500;" scale="0.01 0.01 0.01" position="0 0 -0.5" geometry="primitive: ring" material="color: white; shader: flat; opacity:0.5">
+            </a-entity>
+          </a-camera>
+        </a-entity>
+  
+        <a-plane position="0 0 0" rotation="-90 0 0" width="5" height="5" color="#7BC8A4"></a-plane>
+        <a-point position="0 0 0" color="#888" size="0.05" perspective="true" transparent="true" blending="2"></a-point>
+        <a-sky color="#333388"></a-sky>
+            
+    </a-scene>
+    <script>
+        const points = document.querySelector("a-point")
+        const mul = x => 0.1 * x
+
+        var update_lock = false;
+
+        function getData() {
+            update_lock = true;
+
+            var req = new XMLHttpRequest();
+            req.open("get", "http://192.168.0.7:1880/pointcloud", false); // false=同期アクセス
+            req.send(null); // HTTPリクエストの発行
+
+            var pointcloud = [];
+
+            var data = JSON.parse(req.responseText);
+
+            var result = [];
+            for (key in data) {
+                var pos = key.split(" ");
+                pointcloud.push(pos);
+            }
+
+            points.components.point.setPoints(
+                pointcloud
+                    .map(star => [mul(star[0]-25), mul(star[1]-10), mul(star[2])]));
+            
+            update_lock = false;
+
+            return;
+        }
+
+        var ws = new WebSocket('ws://192.168.0.7:1880/ws/position');
+		ws.onopen = function() {
+			console.log('onopen');
+		};
+		ws.onmessage = function (event) {
+            // console.log("onmessage");
+            
+            if (!update_lock) {
+                getData();
+            }
+        };
+
+
+    </script>
+</body>
+
+</html>
