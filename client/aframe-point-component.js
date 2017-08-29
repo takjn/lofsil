@@ -126,12 +126,20 @@
 	  },
 
 	  setPoints: function (points) {
+			var colors = [];
+
 	    this.geometry = new THREE.Geometry();
 	    var vertices = this.geometry.vertices;
 	    points.forEach(function (point) {
-	      vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
-	    });
-	    // Create mesh.
+				vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
+				var c = "hsl(" + point[3] * 10 + ", 100%, 50%)";
+				colors.push(new THREE.Color(c));
+			});
+
+			this.geometry.colors = colors;
+			this.material = new THREE.PointsMaterial({ size:0.1,sizeAttenuation:true,vertexColors: THREE.VertexColors});
+			
+			// Create mesh.
 	    this.points = new THREE.Points(this.geometry, this.material);
 	    // Set mesh on entity.
 	    this.el.setObject3D('mesh', this.points);
