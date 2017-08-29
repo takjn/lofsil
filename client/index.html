@@ -35,25 +35,41 @@
             update_lock = true;
 
             var req = new XMLHttpRequest();
-            req.open("get", "http://192.168.0.7:1880/heatmap", false); // false=同期アクセス
+            req.open("get", "http://192.168.0.7:1880/heatmap", true);
+
+            req.onload = function (e) {
+                if (req.readyState === 4) {
+                    if (req.status === 200) {
+
+                        var pointcloud = [];
+
+                        var data = JSON.parse(req.responseText);
+
+                        var result = [];
+                        for (key in data) {
+                            var pos = key.split(" ");
+                            pos.push(data[key]);
+                            pointcloud.push(pos);
+                        }
+
+                        points.components.point.setPoints(
+                            pointcloud
+                                .map(star => [mul(star[0]-25), mul(star[1]-10), mul(star[2]), star[3]]));
+                        
+                        update_lock = false;
+
+                    } else {
+                        // console.error(xhr.statusText);
+                        update_lock = false;
+                    }
+                }
+            };
+            req.onerror = function (e) {
+                // console.error(xhr.statusText);
+                update_lock = false;
+            };
+
             req.send(null); // HTTPリクエストの発行
-
-            var pointcloud = [];
-
-            var data = JSON.parse(req.responseText);
-
-            var result = [];
-            for (key in data) {
-                var pos = key.split(" ");
-                pos.push(data[key]);
-                pointcloud.push(pos);
-            }
-
-            points.components.point.setPoints(
-                pointcloud
-                    .map(star => [mul(star[0]-25), mul(star[1]-10), mul(star[2]), star[3]]));
-            
-            update_lock = false;
 
             return;
         }
