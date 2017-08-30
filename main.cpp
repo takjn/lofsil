@@ -142,8 +142,10 @@ void shape_from_silhouette(Websocket *ws) {
     cv::absdiff(img_silhouette_1, img_background_1, img_silhouette_1);
 
     // Get a silhouette
-    cv::threshold(img_silhouette_0, img_silhouette_0, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
-    cv::threshold(img_silhouette_1, img_silhouette_1, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+    // cv::threshold(img_silhouette_0, img_silhouette_0, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+    // cv::threshold(img_silhouette_1, img_silhouette_1, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+    cv::threshold(img_silhouette_0, img_silhouette_0, 50, 255, cv::THRESH_BINARY);
+    cv::threshold(img_silhouette_1, img_silhouette_1, 50, 255, cv::THRESH_BINARY);
 
     // Check each voxels
     char buf[128];

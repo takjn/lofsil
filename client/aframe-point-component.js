@@ -123,16 +123,17 @@
 	    else {
 	      this.index = 0;      
 	    }
-	  },
-
+		},
+		
 	  setPoints: function (points) {
+			const pallet = [80, 70, 60, 50, 40, 30, 20, 15, 10, 5, 0];			
 			var colors = [];
 
 	    this.geometry = new THREE.Geometry();
 	    var vertices = this.geometry.vertices;
 	    points.forEach(function (point) {
 				vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
-				var c = "hsl(" + point[3] * 10 + ", 100%, 50%)";
+				var c = "hsl(" + pallet[point[3]] + ", 100%, 50%)";
 				colors.push(new THREE.Color(c));
 			});
 
