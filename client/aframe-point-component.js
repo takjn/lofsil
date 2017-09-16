@@ -55,26 +55,21 @@
 	 */
 	AFRAME.registerComponent('point', {
 	  schema: {
-	    color: {
-	      type: 'color',
-	      default: '#888'
-	    },
 	    size: {
 	      type: 'number',
 	      default: 1
 	    },
 	    perspective: {
 	      type: 'boolean',
-	      default: false
+	      default: true
+	    },
+	    opacity: {
+	      type: 'number',
+	      default: 1.0
 	    },
 	    transparent: {
 	      type: 'boolean',
 	      default: false
-	    },
-	    blending: {
-	      type: 'number',
-	      default: THREE.NoBlending,
-	      oneOf: [THREE.NoBlending,THREE.NormalBlending,THREE.AdditiveBlending,THREE.SubtractiveBlending,THREE.MultiplyBlending]
 	    }
 	},
 
@@ -104,27 +99,8 @@
 	    this.points = new THREE.Points(this.geometry, this.material);
 	    // Set mesh on entity.
 	    this.el.setObject3D('mesh', this.points);
-	    this.duration=0;
-	    this.index = 0;
 	  },
 
-	  setPoint: function (point) {
-	    var target = this.geometry.vertices[this.index];
-	    if (target != undefined) {
-	      target.x = point[0];
-	      target.y = point[1];
-	      target.z = point[2];
-	      this.geometry.verticesNeedUpdate = true;
-	    }
-
-	    if (this.index < 50000) {
-	      this.index++;
-	    }
-	    else {
-	      this.index = 0;      
-	    }
-		},
-		
 	  setPoints: function (points) {
 			const pallet = [80, 70, 60, 50, 40, 30, 20, 15, 10, 5, 0];			
 			var colors = [];
@@ -136,9 +112,15 @@
 				var c = "hsl(" + pallet[point[3]] + ", 100%, 50%)";
 				colors.push(new THREE.Color(c));
 			});
-
 			this.geometry.colors = colors;
-			this.material = new THREE.PointsMaterial({ size:this.data.size, sizeAttenuation:true, opacity: 0.7, transparent: true, vertexColors: THREE.VertexColors});
+
+			this.material = new THREE.PointsMaterial({
+				size: this.data.size, 
+				sizeAttenuation: this.data.perspective,
+				opacity: this.data.opacity, 
+				transparent: this.data.transparent, 
+				vertexColors: THREE.VertexColors
+			});
 			
 			// Create mesh.
 	    this.points = new THREE.Points(this.geometry, this.material);
@@ -161,11 +143,10 @@
 	    point: {}
 	  },
 	  mappings: {
-	    color: 'point.color',
 	    size: 'point.size',
 	    perspective: 'point.perspective',
+	    opacity: 'point.opacity',
 	    transparent: 'point.transparent',
-	    blending: 'point.blending'
 	  }
 	});
 
