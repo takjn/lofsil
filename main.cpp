@@ -15,18 +15,18 @@ using namespace cv;
 //  3D grid size
 #define GRID_SIZE_X 50     // size
 #define GRID_SIZE_Y 50     // size
-#define GRID_SIZE_Z 20     // size
-#define GRID_SCALE  5.0    // resolution(mm/grid)
+#define GRID_SIZE_Z 45     // size
+#define GRID_SCALE  50.0    // resolution(mm/grid)
 
 // Intrinsic parameters of the camera (cf. OpenCV's Camera Calibration)
-#define CAMERA_0_DISTANCE 110
+#define CAMERA_0_DISTANCE 1350
 #define CAMERA_0_RADIAN 0.0    // 0 degree
 #define CAMERA_0_CENTER_U 87   // Optical centers (cx)
 #define CAMERA_0_CENTER_V 58   // Optical centers (cy)
 #define CAMERA_0_FX 121.0      // Focal length(fx)
 #define CAMERA_0_FY 120.0      // Focal length(fy)
 
-#define CAMERA_1_DISTANCE 110
+#define CAMERA_1_DISTANCE 1120
 #define CAMERA_1_RADIAN 1.5708 // 90 degree
 #define CAMERA_1_CENTER_U 78   // Optical centers (cx)
 #define CAMERA_1_CENTER_V 58   // Optical centers (cy)
@@ -43,6 +43,7 @@ Mat img_background_1;   // background image for NTSC-2A
 
 Mat img_silhouette_0;
 Mat img_silhouette_1;
+char data_buf[128];
 
 int reconst_index = 1;
 int file_name_index = 1;
@@ -142,14 +143,10 @@ void shape_from_silhouette(Websocket *ws) {
     cv::absdiff(img_silhouette_1, img_background_1, img_silhouette_1);
 
     // Get a silhouette
-    // cv::threshold(img_silhouette_0, img_silhouette_0, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
-    // cv::threshold(img_silhouette_1, img_silhouette_1, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
     cv::threshold(img_silhouette_0, img_silhouette_0, 50, 255, cv::THRESH_BINARY);
     cv::threshold(img_silhouette_1, img_silhouette_1, 50, 255, cv::THRESH_BINARY);
 
     // Check each voxels
-    char buf[128];
-
     for (int z=0; z<GRID_SIZE_Z; z++) {
         for (int y=0; y<GRID_SIZE_Y; y++) {
             for (int x=0; x<GRID_SIZE_X; x++) {
@@ -168,8 +165,8 @@ void shape_from_silhouette(Websocket *ws) {
                             unsigned char *src1 = img_silhouette_1.ptr<unsigned char>(camera_1_table[x][y][z][1]);
                             if (src1[camera_1_table[x][y][z][0]]) {
                                 // Keep the point because it is inside the shilhouette
-                                sprintf(buf, "%d %d %d", x, y, z);
-                                int error_c = ws->send(buf);
+                                sprintf(data_buf, "%d %d %d", x, y, z);
+                                int error_c = ws->send(data_buf);
                             }
                         }
                     }
@@ -192,7 +189,7 @@ int main() {
     printf("IP Address is %s\r\n", eth.get_ip_address());
 
     // Create a websocket instance
-    Websocket ws("ws://192.168.0.7:1880/ws/pointcloud", &eth);
+    Websocket ws("ws://192.168.0.10:1880/ws/pointcloud", &eth);
     int connect_error = ws.connect();
     
     printf("Camera Test\r\n");

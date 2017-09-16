@@ -21,13 +21,13 @@
         <a-cylinder position="1 0.75 -3" radius="0.5" height="2.0" color="#FFC65D"></a-cylinder>
 
         <a-plane position="0 0 0" rotation="-90 0 0" width="5" height="5" color="#7BC8A4"></a-plane>
-        <a-point position="0 0 0" color="#888" size="0.05" perspective="true" transparent="true" blending="2"></a-point>
+        <a-point position="0 0 0" color="#888" size="0.15" perspective="true" transparent="true" blending="2"></a-point>
         <a-sky color="#333388"></a-sky>
 
     </a-scene>
     <script>
         const points = document.querySelector("a-point")
-        const mul = x => 0.05 * x
+        const mul = x => 0.10 * x
 
         var update_lock = false;
 
@@ -35,7 +35,7 @@
             update_lock = true;
 
             var req = new XMLHttpRequest();
-            req.open("get", "http://192.168.0.7:1880/heatmap", true);
+            req.open("get", "http://192.168.0.10:1880/heatmap", true);
 
             req.onload = function (e) {
                 if (req.readyState === 4) {
@@ -54,7 +54,7 @@
 
                         points.components.point.setPoints(
                             pointcloud
-                                .map(star => [mul(star[0]-25), mul(star[1]-10), mul(star[2]), star[3]]));
+                                .map(star => [mul(25 - star[0]), mul(star[1]), mul(25 - star[2]), star[3]]));
                         
                         update_lock = false;
 
@@ -74,20 +74,19 @@
             return;
         }
 
-        var ws = new WebSocket('ws://192.168.0.7:1880/ws/position');
+        var ws = new WebSocket('ws://192.168.0.10:1880/ws/position');
 		ws.onopen = function() {
 			console.log('onopen');
 		};
 		ws.onmessage = function (event) {
             // console.log("onmessage");
-			var msg = JSON.parse(event.data);
+			// var msg = JSON.parse(event.data);
 
-			var x = mul(msg.x - 25);
-			// var y = mul(msg.y - 10);
-			var y = 0;
-            var z = mul(msg.z);
+			// var x = mul(25 - msg.x) * 1.75;
+			// var y = 0;
+            // var z = mul(25 - msg.z) * 1.75;
             
-            document.querySelector("#cameraWrapper").setAttribute('position', {x: x, y: y, z: z})
+            // document.querySelector("#cameraWrapper").setAttribute('position', {x: x, y: y, z: z})
             
             if (!update_lock) {
                 getData();

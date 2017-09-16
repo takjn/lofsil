@@ -138,7 +138,7 @@
 			});
 
 			this.geometry.colors = colors;
-			this.material = new THREE.PointsMaterial({ size:0.02,sizeAttenuation:true,vertexColors: THREE.VertexColors});
+			this.material = new THREE.PointsMaterial({ size:this.data.size, sizeAttenuation:true, opacity: 0.7, transparent: true, vertexColors: THREE.VertexColors});
 			
 			// Create mesh.
 	    this.points = new THREE.Points(this.geometry, this.material);
