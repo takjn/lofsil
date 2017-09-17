@@ -11,6 +11,7 @@
 using namespace cv;
 
 #define DBG_PCMONITOR (1)
+#define DBG_BTN_CHECK (0)
 
 //  3D grid size
 #define GRID_SIZE_X 50     // size
@@ -203,6 +204,7 @@ int main() {
     precalc();
 
     while (1) {
+#if (DBG_BTN_CHECK == 1)
         if (button0 == 0) {
             printf("Finding a storage...");
             // wait for the storage device to be connected
@@ -220,6 +222,7 @@ int main() {
             cv::imwrite("/storage/img_silhouette_1.bmp", img_silhouette_1);
             printf("done\r\n");
         }
+#endif
 
         shape_from_silhouette(&ws);
 
