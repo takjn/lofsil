@@ -35,8 +35,8 @@ using namespace cv;
 
 // pre-calculation table
 int camera_area_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z];
-int camera_0_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z][3];
-int camera_1_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z][3];
+int camera_0_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z][2];
+int camera_1_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z][2];
 
 /* Application variables */
 Mat img_background_0;   // background image for NTSC-1A
