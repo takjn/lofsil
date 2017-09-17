@@ -34,6 +34,7 @@ using namespace cv;
 #define CAMERA_1_FY 122.5      // Focal length(fy)
 
 // pre-calculation table
+int camera_area_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z];
 int camera_0_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z][3];
 int camera_1_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z][3];
 
@@ -118,12 +119,12 @@ void precalc() {
                 ret = projection_0(xx, yy, zz, u, v);
                 camera_0_table[x][y][z][0] = u;
                 camera_0_table[x][y][z][1] = v;
-                camera_0_table[x][y][z][2] = ret;
                 
-                ret = projection_1(xx, yy, zz, u, v);
+                ret = ret & projection_1(xx, yy, zz, u, v);
                 camera_1_table[x][y][z][0] = u;
                 camera_1_table[x][y][z][1] = v;
-                camera_1_table[x][y][z][2] = ret;
+
+                camera_area_table[x][y][z] = ret;
 
             }
         }
@@ -152,22 +153,17 @@ void shape_from_silhouette(Websocket *ws) {
             for (int x=0; x<GRID_SIZE_X; x++) {
                     
                 // Project a 3D point into camera0 coordinates
-                if (camera_0_table[x][y][z][2]) {
+                if (camera_area_table[x][y][z]) {
                     
-                    // if (img_silhouette_0.at<unsigned char>(v, u)) {
                     unsigned char *src0 = img_silhouette_0.ptr<unsigned char>(camera_0_table[x][y][z][1]);
                     if (src0[camera_0_table[x][y][z][0]]) {
 
                         // Project a 3D point into camera1 coordinates
-                        if (camera_1_table[x][y][z][2]) {
-
-                            // if (img_silhouette_1.at<unsigned char>(v, u)) {
-                            unsigned char *src1 = img_silhouette_1.ptr<unsigned char>(camera_1_table[x][y][z][1]);
-                            if (src1[camera_1_table[x][y][z][0]]) {
-                                // Keep the point because it is inside the shilhouette
-                                sprintf(data_buf, "%d %d %d", x, y, z);
-                                int error_c = ws->send(data_buf);
-                            }
+                        unsigned char *src1 = img_silhouette_1.ptr<unsigned char>(camera_1_table[x][y][z][1]);
+                        if (src1[camera_1_table[x][y][z][0]]) {
+                            // Keep the point because it is inside the shilhouette
+                            sprintf(data_buf, "%d %d %d", x, y, z);
+                            int error_c = ws->send(data_buf);
                         }
                     }
                 }
