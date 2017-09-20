@@ -36,7 +36,7 @@
             update_lock = true;
 
             var req = new XMLHttpRequest();
-            req.open("get", "http://192.168.0.10:1880/heatmap", true);
+            req.open("get", "http://192.168.0.12:1880/heatmap", true);
 
             req.onload = function (e) {
                 if (req.readyState === 4) {
@@ -75,7 +75,7 @@
             return;
         }
 
-        var ws = new WebSocket('ws://192.168.0.10:1880/ws/position');
+        var ws = new WebSocket('ws://192.168.0.12:1880/ws/position');
 		ws.onopen = function() {
 			console.log('onopen');
 		};

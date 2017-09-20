@@ -45,7 +45,7 @@ Mat img_background_1;   // background image for NTSC-2A
 
 Mat img_silhouette_0;
 Mat img_silhouette_1;
-char data_buf[128];
+char data_buf[4];
 
 int reconst_index = 1;
 int file_name_index = 1;
@@ -163,7 +163,10 @@ void shape_from_silhouette(Websocket *ws) {
                         unsigned char *src1 = img_silhouette_1.ptr<unsigned char>(camera_1_table[x][y][z][1]);
                         if (src1[camera_1_table[x][y][z][0]]) {
                             // Keep the point because it is inside the shilhouette
-                            sprintf(data_buf, "%d %d %d", x, y, z);
+                            data_buf[0] = x;
+                            data_buf[1] = y;
+                            data_buf[2] = z;
+                            data_buf[3] = '\0';
                             int error_c = ws->send(data_buf);
                         }
                     }
@@ -186,7 +189,7 @@ int main() {
     printf("IP Address is %s\r\n", eth.get_ip_address());
 
     // Create a websocket instance
-    Websocket ws("ws://192.168.0.10:1880/ws/pointcloud", &eth);
+    Websocket ws("ws://192.168.0.12:1880/ws/pointcloud", &eth);
     int connect_error = ws.connect();
     
     printf("Camera Test\r\n");
