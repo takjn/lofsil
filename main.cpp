@@ -14,10 +14,10 @@ using namespace cv;
 #define DBG_BTN_CHECK (0)
 
 //  3D grid size
-#define GRID_SIZE_X 50     // size
-#define GRID_SIZE_Y 50     // size
-#define GRID_SIZE_Z 45     // size
-#define GRID_SCALE  50.0    // resolution(mm/grid)
+#define GRID_SIZE_X 60     // size
+#define GRID_SIZE_Y 60     // size
+#define GRID_SIZE_Z 50     // size
+#define GRID_SCALE  40.0    // resolution(mm/grid)
 
 // Intrinsic parameters of the camera (cf. OpenCV's Camera Calibration)
 #define CAMERA_0_DISTANCE 1350
@@ -35,9 +35,9 @@ using namespace cv;
 #define CAMERA_1_FY 122.5      // Focal length(fy)
 
 // pre-calculation table
-int camera_area_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z];
-int camera_0_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z][2];
-int camera_1_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z][2];
+uint8_t camera_area_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z];
+uint8_t camera_0_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z][2];
+uint8_t camera_1_table[GRID_SIZE_X][GRID_SIZE_Y][GRID_SIZE_Z][2];
 
 /* Application variables */
 Mat img_background_0;   // background image for NTSC-1A
@@ -149,10 +149,12 @@ void shape_from_silhouette(Websocket *ws) {
     cv::threshold(img_silhouette_1, img_silhouette_1, 50, 255, cv::THRESH_BINARY);
 
     // Check each voxels
+    int o = 1;
     for (int z=0; z<GRID_SIZE_Z; z++) {
-        for (int y=0; y<GRID_SIZE_Y; y++) {
-            for (int x=0; x<GRID_SIZE_X; x++) {
-                    
+        o = 1 - o;
+        for (int y=(1 - o); y<GRID_SIZE_Y; y+=2) {
+            for (int x=(o); x<GRID_SIZE_X; x+=2) {
+                
                 // Project a 3D point into camera0 coordinates
                 if (camera_area_table[x][y][z]) {
                     
