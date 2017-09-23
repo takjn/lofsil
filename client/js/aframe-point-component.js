@@ -82,23 +82,6 @@
 	   * Called once when component is attached. Generally for initial setup.
 	   */
 	  init: function () {
-	    // Create geometry.
-	    this.geometry = new THREE.Geometry();
-	    for (i=0;i<50000;i++) {
-	      this.geometry.vertices.push(new THREE.Vector3(0, 0, 0));
-	    }
-	    // Create material.
-	    this.material = new THREE.PointsMaterial({
-	      color: this.data.color,
-	      size: this.data.size,
-	      sizeAttenuation: this.data.perspective,
-	      blending: this.data.blending,
-	      transparent: this.data.transparent
-	    });
-	    // Create mesh.
-	    this.points = new THREE.Points(this.geometry, this.material);
-	    // Set mesh on entity.
-	    this.el.setObject3D('mesh', this.points);
 	  },
 
 	  setPoints: function (points) {

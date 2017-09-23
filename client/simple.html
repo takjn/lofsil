@@ -1,0 +1,93 @@
+<html>
+
+<head>
+    <title>lofsil - 3D Heatmap</title>
+    <script src="./js/aframe.min.js"></script>
+    <script src="./js/aframe-point-component.js"></script>
+</head>
+
+<body>
+    <a-scene>
+        <a-entity id='cameraWrapper' position="0 0 10">
+            <a-entity camera="userHeight: 1.3; fov:30;" look-controls wasd-controls="fly:true">
+            </a-entity>
+        </a-entity>
+  
+        <a-plane position="0 0 0" rotation="-90 0 0" width="2" height="2" color="#AAAAAA"></a-plane>
+        <a-sky color="#24CAFF" radius="1000"></a-sky>
+        <a-point position="0 0 0" size="0.30" perspective="true" opacity="0.9" transparent="true"></a-point>
+    </a-scene>
+    <script>
+        const url_base = "192.168.0.12:1880";   // node-red server address
+        const pcd_offset = 25;                  // 3D grid size / 2
+        const pcd_scale = x => 0.04 * x;        // resolution(mm/grid)
+
+        const points = document.querySelector("a-point");
+        var update_lock = false;
+
+        function getData() {
+            update_lock = true;
+
+            var req = new XMLHttpRequest();
+            req.open("get", "http://" + url_base + "/heatmap", true);
+
+            req.onload = function (e) {
+                if (req.readyState === 4) {
+                    if (req.status === 200) {
+
+                        var pointcloud = [];
+
+                        var data = JSON.parse(req.responseText);
+
+                        var result = [];
+                        for (key in data) {
+                            var pos = key.split(" ");
+                            pos.push(data[key]);
+                            pointcloud.push(pos);
+                        }
+
+
+                        points.components.point.setPoints(
+                            pointcloud
+                                .map(star => [pcd_scale(pcd_offset - star[0]), pcd_scale(star[1]), pcd_scale(pcd_offset - star[2]), star[3]]));
+                        
+                        update_lock = false;
+
+                    } else {
+                        // console.error(xhr.statusText);
+                        update_lock = false;
+                    }
+                }
+            };
+            req.onerror = function (e) {
+                // console.error(xhr.statusText);
+                update_lock = false;
+            };
+
+            req.send(null); // HTTPリクエストの発行
+
+            return;
+        }
+
+        var ws = new WebSocket('ws://' + url_base + '/ws/position');
+		ws.onopen = function() {
+			console.log('onopen');
+		};
+		ws.onmessage = function (event) {
+            // console.log("onmessage");
+			var msg = JSON.parse(event.data);
+			var x = pcd_scale(pcd_offset - msg.x);
+			var y = 0;
+            var z = pcd_scale(pcd_offset - msg.z);
+
+            // document.querySelector("#cameraWrapper").setAttribute('position', {x: x, y: y, z: z})
+            if (!update_lock) {
+                getData();
+            }
+        };
+
+
+    </script>
+</body>
+
+</html>
