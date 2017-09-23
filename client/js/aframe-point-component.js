@@ -102,7 +102,7 @@
 	  },
 
 	  setPoints: function (points) {
-			const pallet = [80, 70, 60, 50, 40, 30, 20, 15, 10, 5, 0];			
+			const pallet = [60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 0];			
 			var colors = [];
 
 	    this.geometry = new THREE.Geometry();
