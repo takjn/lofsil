@@ -1,8 +1,7 @@
 <html>
 
 <head>
-    <title>A-Frame Point Component - Star map</title>
-    <meta name="description" content="Using Point component for rendering very many points."></meta>
+    <title>lofsil - 3D Heatmap</title>
     <script src="./js/aframe.min.js"></script>
     <script src="./js/aframe-point-component.js"></script>
 </head>
@@ -15,25 +14,23 @@
             <img id="kyara" src="./image/kyara.png">
         </a-assets>
 
-        <a-image src="#banner" width="6" height="4" position="0 2 -5" rotation="0 0 0"></a-image>
-        <a-image src="#contest" width="6" height="0.5" position="0 1 4" rotation="0 -180 0"></a-image>
-        
         <a-entity id='cameraWrapper' position="0 0 0">
             <a-entity camera="userHeight: 1.6; fov:30;" look-controls wasd-controls="fly:true">
-                    <!-- <a-entity id="myCursor" cursor="fuse:true;" scale="0.01 0.01 0.01" position="0 0 -0.5" geometry="primitive: ring" material="color: white; shader: flat; opacity:0.5">
-                    </a-entity> -->
             </a-entity>
         </a-entity>
 
-        <a-plane position="0 0 0" rotation="-90 0 0" width="6" height="6" color="#AAAAAA"></a-plane>
-
+        <a-image src="#banner" width="6" height="4" position="0 2 -5" rotation="0 0 0"></a-image>
+        <a-image src="#contest" width="6" height="0.5" position="0 1 4" rotation="0 -180 0"></a-image>
         <a-image src="#kyara" width="1.4" height="1" position="0 0.01 0" rotation="-90 0 0"></a-image>
+
+        <a-plane position="0 0 0" rotation="-90 0 0" width="6" height="6" color="#AAAAAA"></a-plane>
 
         <a-point position="0 0 0" size="0.20" perspective="true" opacity="0.9" transparent="true"></a-point>
         <a-sky color="#AAAAFF"></a-sky>
 
     </a-scene>
     <script>
+        const url_base = "192.168.0.12:1880";
         const points = document.querySelector("a-point")
         const mul = x => 0.05 * x
 
@@ -43,7 +40,7 @@
             update_lock = true;
 
             var req = new XMLHttpRequest();
-            req.open("get", "http://192.168.0.12:1880/heatmap", true);
+            req.open("get", "http://" + url_base + "/heatmap", true);
 
             req.onload = function (e) {
                 if (req.readyState === 4) {
@@ -82,23 +79,23 @@
             return;
         }
 
-        var ws = new WebSocket('ws://192.168.0.12:1880/ws/position');
+        var ws = new WebSocket('ws://' + url_base + '/ws/position');
 		ws.onopen = function() {
 			console.log('onopen');
 		};
 		ws.onmessage = function (event) {
             // console.log("onmessage");
-			var msg = JSON.parse(event.data);
+			// var msg = JSON.parse(event.data);
 
-			var x = mul(30 - msg.x) * 2;
-			var y = 0;
-            var z = mul(30 - msg.z) * 2;
+			// var x = mul(30 - msg.x);
+			// var y = 0;
+            // var z = mul(30 - msg.z);
             
-            document.querySelector("#cameraWrapper").setAttribute('position', {x: x, y: y, z: z})
+            // document.querySelector("#cameraWrapper").setAttribute('position', {x: x, y: y, z: z})
             
-            // if (!update_lock) {
-            //     getData();
-            // }
+            if (!update_lock) {
+                getData();
+            }
         };
 
 
