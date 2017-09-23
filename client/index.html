@@ -3,32 +3,39 @@
 <head>
     <title>A-Frame Point Component - Star map</title>
     <meta name="description" content="Using Point component for rendering very many points."></meta>
-    <script src="./aframe.min.js"></script>
-    <script src="./aframe-point-component.js"></script>
+    <script src="./js/aframe.min.js"></script>
+    <script src="./js/aframe-point-component.js"></script>
 </head>
 
 <body>
     <a-scene>
+        <a-assets>
+            <img id="banner" src="./image/banner.jpg">
+            <img id="contest" src="./image/contest.png">
+            <img id="kyara" src="./image/kyara.png">
+        </a-assets>
+
+        <a-image src="#banner" width="6" height="4" position="0 2 -5" rotation="0 0 0"></a-image>
+        <a-image src="#contest" width="6" height="0.5" position="0 1 4" rotation="0 -180 0"></a-image>
+        
         <a-entity id='cameraWrapper' position="0 0 0">
-            <a-camera>
-            <a-entity id="myCursor" cursor="fuse:true;" scale="0.01 0.01 0.01" position="0 0 -0.5" geometry="primitive: ring" material="color: white; shader: flat; opacity:0.5">
+            <a-entity camera="userHeight: 1.6; fov:30;" look-controls wasd-controls="fly:true">
+                    <!-- <a-entity id="myCursor" cursor="fuse:true;" scale="0.01 0.01 0.01" position="0 0 -0.5" geometry="primitive: ring" material="color: white; shader: flat; opacity:0.5">
+                    </a-entity> -->
             </a-entity>
-          </a-camera>
         </a-entity>
 
-        <a-sphere position="0 1.6 -5" radius="1.25" color="#EF2D5E"></a-sphere>
-        <a-box position="-1 0.5 -3" rotation="0 45 0" width="1" height="1.5" depth="1"  color="#4CC3D9"></a-box>
-        <a-cylinder position="1 0.75 -3" radius="0.5" height="2.0" color="#FFC65D"></a-cylinder>
+        <a-plane position="0 0 0" rotation="-90 0 0" width="6" height="6" color="#AAAAAA"></a-plane>
 
-        <a-plane position="0 0 0" rotation="-90 0 0" width="5" height="5" color="#7BC8A4"></a-plane>
-        <!-- <a-plane position="-2 0.01 0" rotation="-90 0 0" width="2" height="2" color="#000000"></a-plane> -->
+        <a-image src="#kyara" width="1.4" height="1" position="0 0.01 0" rotation="-90 0 0"></a-image>
+
         <a-point position="0 0 0" size="0.20" perspective="true" opacity="0.9" transparent="true"></a-point>
-        <a-sky color="#444499"></a-sky>
+        <a-sky color="#AAAAFF"></a-sky>
 
     </a-scene>
     <script>
         const points = document.querySelector("a-point")
-        const mul = x => 0.10 * x
+        const mul = x => 0.05 * x
 
         var update_lock = false;
 
@@ -81,17 +88,17 @@
 		};
 		ws.onmessage = function (event) {
             // console.log("onmessage");
-			// var msg = JSON.parse(event.data);
+			var msg = JSON.parse(event.data);
 
-			// var x = mul(30 - msg.x) * 1.75;
-			// var y = 0;
-            // var z = mul(30 - msg.z) * 1.75;
+			var x = mul(30 - msg.x) * 2;
+			var y = 0;
+            var z = mul(30 - msg.z) * 2;
             
-            // document.querySelector("#cameraWrapper").setAttribute('position', {x: x, y: y, z: z})
+            document.querySelector("#cameraWrapper").setAttribute('position', {x: x, y: y, z: z})
             
-            if (!update_lock) {
-                getData();
-            }
+            // if (!update_lock) {
+            //     getData();
+            // }
         };
 
 
