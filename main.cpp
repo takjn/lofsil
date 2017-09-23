@@ -13,11 +13,14 @@ using namespace cv;
 #define DBG_PCMONITOR (1)
 #define DBG_BTN_CHECK (0)
 
-//  3D grid size
-#define GRID_SIZE_X 60     // size
-#define GRID_SIZE_Y 60     // size
+// node-red server url
+#define SERVER_URL "ws://192.168.0.12:1880/ws/pointcloud"
+
+// 3D grid size
+#define GRID_SIZE_X 50     // size
+#define GRID_SIZE_Y 50     // size
 #define GRID_SIZE_Z 50     // size
-#define GRID_SCALE  40.0    // resolution(mm/grid)
+#define GRID_SCALE  40.0   // resolution(mm/grid)
 
 // Intrinsic parameters of the camera (cf. OpenCV's Camera Calibration)
 #define CAMERA_0_DISTANCE 1350
@@ -169,7 +172,7 @@ void shape_from_silhouette(Websocket *ws) {
                             data_buf[1] = y;
                             data_buf[2] = z;
                             data_buf[3] = '\0';
-                            int error_c = ws->send(data_buf);
+                            ws->send(data_buf);
                         }
                     }
                 }
@@ -177,13 +180,13 @@ void shape_from_silhouette(Websocket *ws) {
         }
     }
 
-    int error_c = ws->send("end");
+    ws->send("end");
 }
 
 int main() {
 
     // announce
-    printf("Websocket Example v1.0.0\r\n");
+    printf("lofsil - 3D Heatmap\r\n");
     
     // Create a network interface and connect
     EthernetInterface eth;
@@ -191,7 +194,7 @@ int main() {
     printf("IP Address is %s\r\n", eth.get_ip_address());
 
     // Create a websocket instance
-    Websocket ws("ws://192.168.0.12:1880/ws/pointcloud", &eth);
+    Websocket ws(SERVER_URL, &eth);
     int connect_error = ws.connect();
     
     printf("Camera Test\r\n");

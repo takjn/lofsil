@@ -69,10 +69,11 @@
 
     </a-scene>
     <script>
-        const url_base = "192.168.0.12:1880";
-        const points = document.querySelector("a-point")
-        const mul = x => 0.1 * x
+        const url_base = "192.168.0.12:1880";   // node-red server address
+        const pcd_offset = 25;                  // 3D grid size / 2
+        const pcd_scale = x => 0.04 * x;        // resolution(mm/grid)
 
+        const points = document.querySelector("a-point");
         var update_lock = false;
 
         function getData() {
@@ -99,7 +100,7 @@
 
                         points.components.point.setPoints(
                             pointcloud
-                                .map(star => [mul(30 - star[0]), mul(star[1]), mul(30 - star[2]), star[3]]));
+                                .map(star => [pcd_scale(pcd_offset - star[0]), pcd_scale(star[1]), pcd_scale(pcd_offset - star[2]), star[3]]));
                         
                         update_lock = false;
 
@@ -127,9 +128,9 @@
             // console.log("onmessage");
 			// var msg = JSON.parse(event.data);
 
-			// var x = mul(30 - msg.x);
+			// var x = pcd_scale(pcd_offset - msg.x);
 			// var y = 0;
-            // var z = mul(30 - msg.z);
+            // var z = pcd_scale(pcd_offset - msg.z);
             
             // document.querySelector("#cameraWrapper").setAttribute('position', {x: x, y: y, z: z})
             
