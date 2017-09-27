@@ -8,7 +8,6 @@
 </head>
 
 <body>
-    <!-- <a-scene> -->
     <a-scene gridhelper="size:10; divisions:20; colorGrid:#249889;">
             <a-assets>
             <img id="grid" src="./image/grasslight-big.jpg">
@@ -21,14 +20,14 @@
             <img id="gr-kurumi" src="./image/gr-kurumi.jpg">
             <img id="gr-peach" src="./image/gr-peach.jpg">
             <img id="gr-sakura" src="./image/gr-sakura.jpg">
-            <audio id="click-sound" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/audio/click.ogg"></audio>            
+            <audio id="click-sound" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/audio/click.ogg"></audio>
         </a-assets>
 
         <a-entity id='cameraWrapper' position="0 0 0">
             <a-entity camera="userHeight: 1.3; fov:30;" look-controls wasd-controls="fly:true">
             </a-entity>
         </a-entity>
-                       
+        <a-entity id='click' sound="src: #click-sound" volume="100"></a-entity>                       
         <a-entity light="color: #ccccff; intensity: 1; type: ambient;"></a-entity>
         <a-entity light="color: white; type: ambient;"></a-entity>
   
@@ -83,48 +82,40 @@
         const points = document.querySelector("a-point");
         var update_lock = false;
 
+        var last_image_id = "#cotton";
+        function showImage(id) {
+            if (last_image_id != id) {
+                document.querySelector("#click").components.sound.playSound();
+            }
+            document.querySelector(id).setAttribute('scale', {x: 1., y: 1, z: 1});
+            last_image_id = id;
+        }
+
         function updateImages(msg) {
-            document.querySelector("#cotton").setAttribute('scale', {x: 1.5, y: 1, z: 1});
-            document.querySelector("#citrus").setAttribute('scale', {x: 1.5, y: 1, z: 1});
-            document.querySelector("#kurumi").setAttribute('scale', {x: 1.5, y: 1, z: 1});
-            document.querySelector("#adzuki").setAttribute('scale', {x: 1.5, y: 1, z: 1});
-            document.querySelector("#peach").setAttribute('scale', {x: 1.5, y: 1, z: 1});
-            document.querySelector("#sakura").setAttribute('scale', {x: 1.5, y: 1, z: 1});
+            document.querySelector(last_image_id).setAttribute('scale', {x: 1.5, y: 1, z: 1});
             
             if (msg.z<15) {
                 if (msg.x<15) {
-                    // document.querySelector("#cotton").setAttribute('scale', {x: 1.5, y: 1, z: 1});
-                    // document.querySelector("#citrus").setAttribute('scale', {x: 1.5, y: 1, z: 1});
-                    document.querySelector("#kurumi").setAttribute('scale', {x: 1., y: 1, z: 1});
+                    showImage("#kurumi");
                 }
                 else if (msg.x>30) {
-                    // document.querySelector("#adzuki").setAttribute('scale', {x: 1.5, y: 1, z: 1});
-                    // document.querySelector("#peach").setAttribute('scale', {x: 1.5, y: 1, z: 1});
-                    document.querySelector("#sakura").setAttribute('scale', {x: 1., y: 1, z: 1});
+                    showImage("#sakura");
                 }
             }
             else if (msg.z>30) {
                 if (msg.x<15) {
-                    document.querySelector("#cotton").setAttribute('scale', {x: 1., y: 1, z: 1});
-                    // document.querySelector("#citrus").setAttribute('scale', {x: 1.5, y: 1, z: 1});
-                    // document.querySelector("#kurumi").setAttribute('scale', {x: 1.5, y: 1, z: 1});
+                    showImage("#cotton");
                 }
                 else if (msg.x>30) {
-                    document.querySelector("#adzuki").setAttribute('scale', {x: 1., y: 1, z: 1});
-                    // document.querySelector("#peach").setAttribute('scale', {x: 1.5, y: 1, z: 1});
-                    // document.querySelector("#sakura").setAttribute('scale', {x: 1.5, y: 1, z: 1});
+                    showImage("#adzuki");
                 }
             }
             else {
                 if (msg.x<15) {
-                    // document.querySelector("#cotton").setAttribute('scale', {x: 1.5, y: 1, z: 1});
-                    document.querySelector("#citrus").setAttribute('scale', {x: 1., y: 1, z: 1});
-                    // document.querySelector("#kurumi").setAttribute('scale', {x: 1.5, y: 1, z: 1});
+                    showImage("#citrus");
                 }
                 else if (msg.x>30) {
-                    // document.querySelector("#adzuki").setAttribute('scale', {x: 1.5, y: 1, z: 1});
-                    document.querySelector("#peach").setAttribute('scale', {x: 1., y: 1, z: 1});
-                    // document.querySelector("#sakura").setAttribute('scale', {x: 1.5, y: 1, z: 1});
+                    showImage("#peach");
                 }
             }
         }
@@ -139,17 +130,14 @@
                 if (req.readyState === 4) {
                     if (req.status === 200) {
 
-                        var pointcloud = [];
-
                         var data = JSON.parse(req.responseText);
 
-                        var result = [];
+                        var pointcloud = [];
                         for (key in data) {
                             var pos = key.split(" ");
                             pos.push(data[key]);
                             pointcloud.push(pos);
                         }
-
 
                         points.components.point.setPoints(
                             pointcloud
@@ -174,23 +162,19 @@
         }
 
         var ws = new WebSocket('ws://' + url_base + '/ws/position');
-		ws.onopen = function() {
-			console.log('onopen');
-		};
 		ws.onmessage = function (event) {
             // console.log("onmessage");
 			var msg = JSON.parse(event.data);
-			var x = pcd_scale(pcd_offset - msg.x);
-			var y = 0;
-            var z = pcd_scale(pcd_offset - msg.z);
-
             updateImages(msg);
+
+            // var x = pcd_scale(pcd_offset - msg.x);
+			// var y = 0;
+            // var z = pcd_scale(pcd_offset - msg.z);
             // document.querySelector("#cameraWrapper").setAttribute('position', {x: x, y: y, z: z})
             if (!update_lock) {
                 getData();
             }
         };
-
 
     </script>
 </body>

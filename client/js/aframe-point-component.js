@@ -76,7 +76,7 @@
 	  /**
 	   * Set if component needs multiple instancing.
 	   */
-	  multiple: true,
+	  multiple: false,
 
 	  /**
 	   * Called once when component is attached. Generally for initial setup.
