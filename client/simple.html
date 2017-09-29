@@ -3,7 +3,7 @@
 <head>
     <title>lofsil - 3D Heatmap</title>
     <script src="./js/aframe.min.js"></script>
-    <script src="./js/aframe-point-component.js"></script>
+    <script src="./js/aframe-heatmap-component.js"></script>
 </head>
 
 <body>
@@ -15,14 +15,14 @@
   
         <a-plane position="0 0 0" rotation="-90 0 0" width="2" height="2" color="#AAAAAA"></a-plane>
         <a-sky color="#24CAFF" radius="1000"></a-sky>
-        <a-point position="0 0 0" size="0.30" perspective="true" opacity="0.9" transparent="true"></a-point>
+        <a-heatmap position="0 0 0" size="0.30" perspective="true" opacity="0.9" transparent="true"></a-heatmap>
     </a-scene>
     <script>
         const url_base = "192.168.0.12:1880";   // node-red server address
         const pcd_offset = 25;                  // 3D grid size / 2
         const pcd_scale = x => 0.04 * x;        // resolution(mm/grid)
 
-        const points = document.querySelector("a-point");
+        const points = document.querySelector("a-heatmap");
         var update_lock = false;
 
         function getData() {
