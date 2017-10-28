@@ -12,7 +12,8 @@
     };
     */
     </script>
-    <script src="https://cdn.rawgit.com/aframevr/aframe/v0.5.0/dist/aframe-master.min.js"></script>
+    <!-- <script src="https://cdn.rawgit.com/aframevr/aframe/v0.5.0/dist/aframe-master.min.js"></script> -->
+    <script src="./js/aframe-v0.7.1.min.js"></script>
     <script src="https://cdn.rawgit.com/kripken/ammo.js/dcab07bf0e7f2b4b64c01dc45da846344c8f50be/builds/ammo.js"></script>
     <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v3.2.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.rawgit.com/takahirox/aframe-outline/v1.1.0/build/aframe-outline.min.js"></script>
@@ -32,7 +33,7 @@ https://github.com/mrdoob/three.js/tree/dev/examples/models/mmd#readme
       </a-assets>
 
       <a-entity id='cameraWrapper' position="0 0 0">
-          <a-entity camera="userHeight: 17;" look-controls wasd-controls="fly:true; acceleration:500;"></a-entity>
+          <a-entity camera look-controls wasd-controls="fly:true; acceleration:500;"></a-entity>
       </a-entity>
 
       <a-entity id="mmd-entity" mmd="audio:https://cdn.rawgit.com/mrdoob/three.js/dev/examples/models/mmd/audios/wavefile_short.mp3;
@@ -65,7 +66,7 @@ https://github.com/mrdoob/three.js/tree/dev/examples/models/mmd#readme
                         
     </a-scene>
     <script>
-        const url_base = "192.168.0.6:1880";   // node-red server address
+        const url_base = "192.168.0.12:1880";   // node-red server address
         const pcd_offset = 25;                  // 3D grid size / 2
         const pcd_scale = x => 0.4 * x;        // resolution(mm/grid)
 
@@ -77,7 +78,7 @@ https://github.com/mrdoob/three.js/tree/dev/examples/models/mmd#readme
           // console.log("onmessage");
           var msg = JSON.parse(event.data);
           var x = pcd_scale(pcd_offset - msg.x);
-          var y = 0;
+          var y = 17;
           var z = pcd_scale(pcd_offset - msg.z);
 
           document.querySelector("#cameraWrapper").setAttribute('position', {x: x, y: y, z: z})

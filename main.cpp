@@ -14,7 +14,7 @@ using namespace cv;
 #define DBG_BTN_CHECK (0)
 
 // node-red server url
-#define SERVER_URL "ws://192.168.0.6:1880/ws/pointcloud"
+#define SERVER_URL "ws://192.168.0.12:1880/ws/pointcloud"
 
 // 3D grid size
 #define GRID_SIZE_X 50     // size
