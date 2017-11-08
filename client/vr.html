@@ -1,0 +1,171 @@
+<html>
+
+<head>
+    <title>lofsil - 3D Heatmap</title>
+    <script src="./js/aframe-v0.7.1.min.js"></script>
+    <script src="./js/aframe-heatmap-component.js"></script>
+    <script src="./js/aframe-gridhelper-component.min.js"></script>
+</head>
+
+<body>
+    <a-scene gridhelper="size:10; divisions:20; colorGrid:#249889;">
+        <a-assets>
+            <img id="ground" src="./image/grasslight-big.jpg">
+            <img id="banner" src="./image/banner.jpg">
+            <img id="contest" src="./image/contest.png">
+            <img id="kyara" src="./image/kyara.png">
+            <img id="gr-citrus" src="./image/gr-citrus.jpg">
+            <img id="gr-cotton" src="./image/gr-cotton.jpg">
+            <img id="gr-adzuki" src="./image/gr-adzuki.jpg">
+            <img id="gr-kurumi" src="./image/gr-kurumi.jpg">
+            <img id="gr-peach" src="./image/gr-peach.jpg">
+            <img id="gr-sakura" src="./image/gr-sakura.jpg">
+            <audio id="do1-sound" src="./mp3/se_maoudamashii_instruments_piano1_1do.mp3"></audio>
+            <audio id="re1-sound" src="./mp3/se_maoudamashii_instruments_piano1_2re.mp3"></audio>
+            <audio id="mi1-sound" src="./mp3/se_maoudamashii_instruments_piano1_3mi.mp3"></audio>
+            <audio id="fa1-sound" src="./mp3/se_maoudamashii_instruments_piano1_4fa.mp3"></audio>
+            <audio id="so1-sound" src="./mp3/se_maoudamashii_instruments_piano1_5so.mp3"></audio>
+            <audio id="ra1-sound" src="./mp3/se_maoudamashii_instruments_piano1_6ra.mp3"></audio>
+            <audio id="si1-sound" src="./mp3/se_maoudamashii_instruments_piano1_7si.mp3"></audio>
+            <audio id="do2-sound" src="./mp3/se_maoudamashii_instruments_piano1_8do.mp3"></audio>
+        </a-assets>
+
+        <a-entity id='cameraWrapper' position="0 0 0">
+            <a-entity camera="userHeight: 1.3; fov:30;" look-controls wasd-controls="fly:true"></a-entity>
+        </a-entity>
+
+        <a-entity id='do1' sound="src: #do1-sound; poolSize: 3; volume: 10;"></a-entity>
+        <a-entity id='re1' sound="src: #re1-sound; poolSize: 3; volume: 10;"></a-entity>
+        <a-entity id='mi1' sound="src: #mi1-sound; poolSize: 3; volume: 10;"></a-entity>
+        <a-entity id='fa1' sound="src: #fa1-sound; poolSize: 3; volume: 10;"></a-entity>
+        <a-entity id='so1' sound="src: #so1-sound; poolSize: 3; volume: 10;"></a-entity>
+        <a-entity id='ra1' sound="src: #ra1-sound; poolSize: 3; volume: 10;"></a-entity>
+        <a-entity id='si1' sound="src: #si1-sound; poolSize: 3; volume: 10;"></a-entity>
+        <a-entity id='do2' sound="src: #do2-sound; poolSize: 3; volume: 10;"></a-entity>
+
+        <a-entity light="color: #ccccff; intensity: 1; type: ambient;"></a-entity>
+        <a-entity light="color: white; type: ambient;"></a-entity>
+
+        <a-plane position="0 0.02 0" rotation="-90 0 0" width="1.8" height="1.8" color="#106688"></a-plane>
+        <a-plane position="0 0.01 0" rotation="-90 0 0" width="2" height="2" color="#FFFF00"></a-plane>
+        <a-entity
+            position="0 -0.01 0"
+            geometry="primitive: plane; width: 500; height: 500;" rotation="-90 0 0"
+            material="src: #ground; repeat: 500 500; transparent: false; metalness:0.6; roughness: 0.4;"></a-entity>
+
+        <a-sky color="#24CAFF" radius="1000"></a-sky>
+        <a-heatmap position="0 0 0" size="0.30" perspective="true" opacity="0.9" transparent="true"></a-heatmap>
+
+        <a-image src="#banner" width="4.5" height="3" position="0 1.5 -5" rotation="0 0 0"></a-image>
+        <a-image src="#contest" width="4" height="0.3" position="0 1 4" rotation="0 -180 0"></a-image>
+        <a-image src="#kyara" width="0.6" height="0.4" position="0 0.03 0" rotation="-90 0 0"></a-image>
+
+        <a-entity id="cotton" scale="1.5 1 1">
+            <a-image src="#gr-cotton" width="1.25" height="1" position="4 1 -1.8" rotation="0 -90 0"></a-image>
+            <a-text font="kelsonsans" value="GR-COTTON" width="4" position="4 0.4 -1.8" rotation="0 -90 0" align="center"></a-text>
+        </a-entity>
+
+        <a-entity id="citrus" scale="1.5 1 1">
+            <a-image src="#gr-citrus" width="1.3" height="1" position="4 1 0" rotation="0 -90 0"></a-image>
+            <a-text font="kelsonsans" value="GR-CITRUS" width="4" position="4 0.4 0" rotation="0 -90 0" align="center"></a-text>
+        </a-entity>
+
+        <a-entity id="kurumi" scale="1.5 1 1">
+            <a-image src="#gr-kurumi" width="1.23" height="1" position="4 1 1.8" rotation="0 -90 0"></a-image>
+            <a-text font="kelsonsans" value="GR-KURUMI" width="4" position="4 0.4 1.8" rotation="0 -90 0" align="center"></a-text>
+        </a-entity>
+
+        <a-entity id="adzuki" scale="1.5 1 1">
+            <a-image src="#gr-adzuki" width="1.18" height="1" position="-4 1 -1.8" rotation="0 90 0"></a-image>
+            <a-text font="kelsonsans" value="GR-ADUKI" width="4" position="-4 0.4 -1.8" rotation="0 90 0" align="center"></a-text>
+        </a-entity>
+        <a-entity id="peach" scale="1.5 1 1">
+            <a-image src="#gr-peach" width="1.39" height="1" position="-4 1 0" rotation="0 90 0"></a-image>
+            <a-text font="kelsonsans" value="GR-PEACH" width="4" position="-4 0.4 0" rotation="0 90 0" align="center"></a-text>
+        </a-entity>
+        <a-entity id="sakura" scale="1.5 1 1">
+            <a-image src="#gr-sakura" width="1.3" height="1" position="-4 1 1.8" rotation="0 90 0"></a-image>
+            <a-text font="kelsonsans" value="GR-SAKURA" width="4" position="-4 0.4 1.8" rotation="0 90 0" align="center"></a-text>
+        </a-entity>
+
+    </a-scene>
+    <script>
+        const url_base = "192.168.0.12:1880";   // node-red server address
+        const pcd_offset = 25;                  // 3D grid size / 2
+        const pcd_scale = x => 0.04 * x;        // resolution(mm/grid)
+
+        const points = document.querySelector("a-heatmap");
+        var update_lock = false;
+
+        var last_image_id = "#cotton";
+        function showImage(id) {
+            document.querySelector(id).setAttribute('scale', {x: 1., y: 1, z: 1});
+            last_image_id = id;
+        }
+
+        var last_sound_id = "";
+        function playSound(id) {
+            if (last_sound_id != id) {
+                document.querySelector(id).components.sound.playSound();
+            }
+            last_sound_id = id;
+        }
+
+        function updateImages(msg) {
+            document.querySelector(last_image_id).setAttribute('scale', {x: 1.5, y: 1, z: 1});
+
+            if (msg.z<16) {
+                if (msg.x<16) {
+                    showImage("#kurumi");
+                    playSound("#so1");
+                }
+                else if (msg.x>32) {
+                    showImage("#sakura");
+                    playSound("#mi1");
+                }
+                else {
+                    playSound("#fa1");
+                }
+            }
+            else if (msg.z>32) {
+                if (msg.x<16) {
+                    showImage("#cotton");
+                    playSound("#si1");
+                }
+                else if (msg.x>32) {
+                    showImage("#adzuki");
+                    playSound("#do1");
+                }
+                else {
+                    playSound("#do2");
+                }
+            }
+            else {
+                if (msg.x<16) {
+                    showImage("#citrus");
+                    playSound("#ra1");
+                }
+                else if (msg.x>32) {
+                    showImage("#peach");
+                    playSound("#re1");
+                }
+            }
+        }
+
+
+        var ws = new WebSocket('ws://' + url_base + '/ws/position');
+        ws.onmessage = function (event) {
+            // console.log("onmessage");
+            var msg = JSON.parse(event.data);
+            updateImages(msg);
+
+            var x = pcd_scale(pcd_offset - msg.x);
+            var y = 0;
+            var z = pcd_scale(pcd_offset - msg.z);
+            document.querySelector("#cameraWrapper").setAttribute('position', {x: x, y: y, z: z})
+        };
+
+    </script>
+</body>
+
+</html>

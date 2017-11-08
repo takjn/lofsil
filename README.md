@@ -10,7 +10,7 @@ GR-PEACHで動作するサンプルプログラムです。
 $ mbed compile -m RZ_A1H -t GCC_ARM --profile debug
 
 ## 概要
-USB0にUSBケーブルを接続してPC用アプリ [DisplayApp](https://developer.mbed.org/users/dkato/code/DisplayApp/)でカメラ映像が表示できます。
+USB0にUSBケーブルを接続してPC用アプリ [DisplayApp](https://developer.mbed.org/users/dkato/code/DisplayApp/)を使うことでカメラ映像を確認できます。
 
 ～参考ページ～  
 [がじぇっとるねさすコミュニティ GR-LYCHEE OpenCV](http://japan.renesasrulz.com/gr_user_forum_japanese/f/gr-lychee/4208/gr-lychee-opencv)
