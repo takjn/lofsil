@@ -15,7 +15,7 @@ GR デザインコンテスト 2017 エントリー作品です。GR-PEACHと2�
 
 ## システム概要
 
-![overview](https://github.com/takjn/lofsil/raw/master/images/lofsil_pic1.png)
+![overview](https://raw.githubusercontent.com/takjn/lofsil/master/images/lofsil_pic1.png)
 
 3Dヒートマップの元データとなる3次元空間データは2台のカメラ画像を元にGR-PEACH上でリアルタイムに生成します。生成された3次元空間データはWebSocketを使いサーバーへリアルタイムで送信されます。 
 
@@ -97,7 +97,7 @@ $ mbed compile -m RZ_A1H -t GCC_ARM --profile debug
 ### カメラの配置
 このプログラムでは、幅×奥行×高さが200×200×200mmの３次元空間データを5mm間隔で取得することができます。床からカメラまでの高さは100mmとしてください。中心点とカメラまでの適切な距離はカメラの画角に依存します。以下に設定例を示します。
 
-![layout](https://github.com/takjn/lofsil/raw/master/images/lofsil_pic2.png)
+![layout](https://raw.githubusercontent.com/takjn/lofsil/master/images/lofsil_pic2.png)
 
 ### プログラムの起動
 
